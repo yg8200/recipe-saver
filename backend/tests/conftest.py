@@ -1,6 +1,6 @@
 import pytest
 from src import create_app
-from src.api.add_recepie import RECIPES
+from src.api.add_recipe import RECIPES
 
 
 @pytest.fixture
