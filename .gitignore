@@ -1,0 +1,23 @@
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment secrets
+.env
+.env.local
+
+# IDE / Editor folders
+.vscode/
+.idea/
+.DS_Store
+
+# Celery & DB local artifacts
+*.sqlite3
+celerybeat-schedule
