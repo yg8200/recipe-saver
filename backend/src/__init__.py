@@ -7,7 +7,7 @@ from src.api.add_recipe import add_recipe_bp
 from src.api.delete_recipe import delete_recipe_bp
 from src.api.change_recipe import change_recipe_bp
 from src.api.get_recipe import get_recipe_bp
-
+from src.api.extract_recipe import extract_recipe_bp
 
 def create_app(config_name: str | None = None) -> Flask:
     app = Flask(__name__)
@@ -24,5 +24,8 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(delete_recipe_bp)
     app.register_blueprint(change_recipe_bp)
     app.register_blueprint(get_recipe_bp)
+    app.register_blueprint(extract_recipe_bp)
+
+    app.json.ensure_ascii = False
 
     return app
