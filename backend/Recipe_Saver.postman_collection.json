@@ -1,0 +1,98 @@
+{
+  "info": {
+    "name": "Recipe Saver API",
+    "_postman_id": "7d9e4a3b-18f2-491c-b3a1-7c5f891b9201",
+    "description": "API collection for local Recipe Saver testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "url": "http://127.0.0.1:5001/health",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "description": ""
+          }
+        ],
+        "description": "Check if the server is up and responsive"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get All Recipes",
+      "request": {
+        "url": "http://127.0.0.1:5001/recipes",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "description": ""
+          }
+        ],
+        "description": "Fetch all saved recipes from PostgreSQL"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Add Recipe (Manual)",
+      "request": {
+        "url": "http://127.0.0.1:5001/recipes",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Classic Shakshuka\",\n  \"ingredients\": [\n    \"4 eggs\",\n    \"4 ripe tomatoes\",\n    \"1 red bell pepper\",\n    \"2 cloves garlic\",\n    \"1 tsp cumin\",\n    \"2 tbsp olive oil\"\n  ],\n  \"instructions\": [\n    \"Saute peppers and garlic.\",\n    \"Add tomatoes and simmer until thick.\",\n    \"Crack eggs and cook until whites set.\"\n  ],\n  \"prep_time_minutes\": 10,\n  \"cook_time_minutes\": 20,\n  \"servings\": 3\n}"
+        },
+        "description": "Create a new recipe manually"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Extract Recipe with AI",
+      "request": {
+        "url": "http://127.0.0.1:5001/recipes/extract",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://sallysbakingaddiction.com/easy-homemade-soft-pretzels/\"\n}"
+        },
+        "description": "Scrape a website URL and extract structured recipe fields using OpenAI"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Delete Recipe by ID",
+      "request": {
+        "url": "http://127.0.0.1:5001/recipes/1",
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "description": ""
+          }
+        ],
+        "description": "Delete a recipe record by its primary key ID"
+      },
+      "response": []
+    }
+  ]
+}
