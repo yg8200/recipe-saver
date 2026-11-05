@@ -1,23 +1,86 @@
-# Virtual environment
-.venv/
-venv/
-ENV/
+# ==========================================
+# Environments & Secrets (CRITICAL)
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
 
-# Python bytecode & cache
+# ==========================================
+# Python Bytecode & Artifacts
+# ==========================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Environment secrets
-.env
-.env.local
+# ==========================================
+# Virtual Environments
+# ==========================================
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
 
-# IDE / Editor folders
-.vscode/
-.idea/
-.DS_Store
+# ==========================================
+# Testing & Code Quality
+# ==========================================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
 
-# Celery & DB local artifacts
+# ==========================================
+# Databases & Local Mounts
+# ==========================================
 *.sqlite3
-celerybeat-schedule
+*.db
+*.sqlite
+# Local Docker volume data if bind-mounted
+pgdata/
+
+# ==========================================
+# Operating System & IDEs
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+
+# JetBrains / PyCharm
+.idea/
+
+# Local logs
+*.log

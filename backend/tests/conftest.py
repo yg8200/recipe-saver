@@ -1,21 +1,19 @@
 import pytest
 from src import create_app
-from src.api.add_recipe import RECIPES
+from src.core.database import db
 
 
 @pytest.fixture
 def app():
-    app = create_app()
-    return app
+    app = create_app("testing")
+
+    with app.app_context():
+        db.create_all()
+        yield app
+        db.session.remove()
+        db.drop_all()
 
 
 @pytest.fixture
 def client(app):
     return app.test_client()
-
-
-@pytest.fixture(autouse=True)
-def clean_recipes_db():
-    RECIPES.clear()
-    yield
-    RECIPES.clear()
