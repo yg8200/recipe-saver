@@ -3,36 +3,32 @@ import os
 import io
 from dotenv import load_dotenv
 from PIL import Image
-import pillow_heif
 from google import genai
 from google.genai import types
 
-# Register HEIF opener so Pillow can open .heic files from iPhones
-pillow_heif.register_heif_opener()
+# Import your new utility function
+from src.utils.image_processing import process_and_compress_image
 
 load_dotenv()
 
 def get_gemini_client() -> genai.Client:
-    """Initializes the official Google GenAI client."""
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY is not set in your .env file.")
-    return genai.Client(api_key=api_key)
+    
+    # Force the client to use the v1beta API version to enable JSON mode
+    return genai.Client(
+        api_key=api_key, 
+        http_options={'api_version': 'v1beta'}
+    )
 
 def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
-    """
-    Extracts structured recipe data using Gemini 2.5 Flash, 
-    which has superior native Hebrew OCR capabilities.
-    """
-    # Convert HEIC to JPEG if necessary
-    if "heic" in mime_type.lower() or "heif" in mime_type.lower():
-        image = Image.open(io.BytesIO(image_bytes))
-        jpeg_buffer = io.BytesIO()
-        image.convert("RGB").save(jpeg_buffer, format="JPEG")
-        image_bytes = jpeg_buffer.getvalue()
+    # 1. Pass the raw bytes to your new compression module
+    # We no longer need the mime_type check because the module forces everything to JPEG
+    optimized_image_bytes = process_and_compress_image(image_bytes)
     
-    # Load the final image into memory for Gemini
-    pil_image = Image.open(io.BytesIO(image_bytes))
+    # 2. Load the optimized image for Gemini
+    pil_image = Image.open(io.BytesIO(optimized_image_bytes))
     client = get_gemini_client()
     
     system_prompt = """
@@ -57,9 +53,8 @@ def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
     }
     """
 
-    # Call Gemini 2.5 Flash with strict JSON formatting and zero temperature
     response = client.models.generate_content(
-        model='gemini-3.8-flash',
+        model='gemini-2.5-flash',
         contents=[system_prompt, pil_image],
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
