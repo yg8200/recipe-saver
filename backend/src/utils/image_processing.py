@@ -1,5 +1,5 @@
 import io
-from PIL import Image
+from PIL import Image, ImageOps, UnidentifiedImageError
 import pillow_heif
 
 # Register HEIF opener so Pillow can open .heic files
@@ -11,7 +11,14 @@ def process_and_compress_image(image_bytes: bytes, max_size: int = 1500) -> byte
     resizes it to a maximum dimension while maintaining aspect ratio,
     and returns optimized JPEG bytes.
     """
-    image = Image.open(io.BytesIO(image_bytes))
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        image.load()
+    except (UnidentifiedImageError, OSError) as exc:
+        raise ValueError("The uploaded file is not a valid or supported image.") from exc
+
+    # Apply the EXIF orientation so phone photos are not sent sideways to the OCR model
+    image = ImageOps.exif_transpose(image)
 
     # Convert to standard RGB (required for saving as JPEG)
     if image.mode != "RGB":

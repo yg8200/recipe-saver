@@ -131,3 +131,10 @@ def test_add_recipe_sequential_ids(client):
     assert res_2.status_code == 201
     assert res_1.get_json()["id"] == 1
     assert res_2.get_json()["id"] == 2
+
+
+def test_add_recipe_rejects_non_integer_times(client):
+    response = client.post("/recipes", json={
+        "title": "Bad times", "ingredients": ["a"], "instructions": ["b"], "prep_time_minutes": "ten",
+    })
+    assert response.status_code == 400

@@ -1,3 +1,5 @@
+import logging
+
 from flask import Blueprint, request, jsonify
 from sqlalchemy import func
 from src.services.image_extractor import extract_recipe_from_image
@@ -6,9 +8,11 @@ from src.api.extract_recipe import validate_extracted_recipe  # ייבוא ה-Gu
 from src.core.database import db
 from src.models.recipe import Recipe
 
+logger = logging.getLogger(__name__)
+
 upload_recipe_bp = Blueprint('upload_recipe', __name__)
 
-@upload_recipe_bp.route('/api/recipes/upload', methods=['POST'])
+@upload_recipe_bp.route('/recipes/upload', methods=['POST'])
 def upload_recipe_image():
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
@@ -32,7 +36,16 @@ def upload_recipe_image():
         raw_extracted_data = extract_recipe_from_image(image_bytes, mime_type)
 
         # 2. Guardrail מבוסס AI: תיקון השגיאות של ה-OCR באנגלית דרך gpt-4o-mini
-        corrected_data = correct_recipe_text(raw_extracted_data)
+        # If the corrector fails (API error, bad JSON, wrong shape), fall back to the raw OCR result
+        # instead of failing the whole upload.
+        try:
+            corrected_data = correct_recipe_text(raw_extracted_data)
+            if not isinstance(corrected_data, dict):
+                raise ValueError("Corrector did not return a JSON object")
+            validate_extracted_recipe(corrected_data)
+        except Exception:
+            logger.warning("Recipe correction failed; saving uncorrected OCR text", exc_info=True)
+            corrected_data = raw_extracted_data
 
         # 3. Guardrail דטרמיניסטי: מוודא שהפלט תקין לפני ה-DB
         validated_data = validate_extracted_recipe(corrected_data)

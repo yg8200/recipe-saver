@@ -1,15 +1,6 @@
 import json
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
+from src.services.ai_client import get_openai_client, get_openai_model
 
-load_dotenv()
-
-def get_openai_client() -> OpenAI:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY is not set.")
-    return OpenAI(api_key=api_key)
 
 def correct_recipe_text(recipe_json: dict) -> dict:
     """
@@ -27,13 +18,13 @@ def correct_recipe_text(recipe_json: dict) -> dict:
     2. Fix and organize the numbering of the instructions so they are clean, sequential, and consistent.
     3. DO NOT add ingredients or steps that were not in the original text. Do not invent a new recipe.
     4. Keep the exact same JSON structure.
-    5. Validate the Hebrew sntax so numbers, units, and culinary terms are correct and well ordered.
+    5. Validate the Hebrew syntax so numbers, units, and culinary terms are correct and well ordered.
     
     Return ONLY a valid JSON object with the corrected Hebrew text.
     """
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=get_openai_model("OPENAI_CORRECTOR_MODEL"),
         temperature=0.0, 
         response_format={"type": "json_object"},
         messages=[

@@ -111,3 +111,10 @@ def test_update_recipe_invalid_numeric_field(client):
     assert response.status_code == 400
     data = response.get_json()
     assert "'prep_time_minutes' must be a non-negative integer or null" in data["error"]
+
+def test_update_recipe_title_to_existing_title_returns_409(client):
+    payload = {"ingredients": ["a"], "instructions": ["b"]}
+    client.post("/recipes", json={"title": "First", **payload})
+    second = client.post("/recipes", json={"title": "Second", **payload}).get_json()
+    response = client.patch(f"/recipes/{second['id']}", json={"title": "first"})
+    assert response.status_code == 409

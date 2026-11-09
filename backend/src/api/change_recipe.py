@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from src.core.database import db
 from src.models.recipe import Recipe
 
@@ -20,7 +22,15 @@ def update_recipe(recipe_id: int):
         title = data["title"]
         if not isinstance(title, str) or not title.strip():
             return jsonify({"error": "'title' must be a non-empty string"}), 400
-        recipe.title = title.strip()
+        title = title.strip()
+        existing = (
+            db.session.query(Recipe)
+            .filter(func.lower(Recipe.title) == title.lower(), Recipe.id != recipe_id)
+            .first()
+        )
+        if existing:
+            return jsonify({"error": f"A recipe with the title '{title}' already exists."}), 409
+        recipe.title = title
 
     if "ingredients" in data:
         ingredients = data["ingredients"]
@@ -41,6 +51,13 @@ def update_recipe(recipe_id: int):
                 return jsonify({"error": f"'{field}' must be a non-negative integer or null"}), 400
             setattr(recipe, field, val)
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "A recipe with this title already exists."}), 409
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
     return jsonify(recipe.to_dict()), 200

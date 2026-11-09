@@ -1,30 +1,39 @@
 import json
-import os
 import urllib.parse
-from dotenv import load_dotenv
 from openai import OpenAI
 from youtube_transcript_api import YouTubeTranscriptApi
 import yt_dlp
 
-load_dotenv()
+from src.services.ai_client import get_openai_client, get_openai_model
 
-def get_openai_client() -> OpenAI:
-    api_key = os.getenv("AI_API_KEY") or os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("AI_BASE_URL")
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY is not set.")
-    return OpenAI(api_key=api_key, base_url=base_url)
+YOUTUBE_HOSTS = ("youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com")
+YOUTU_BE_HOSTS = ("youtu.be", "www.youtu.be")
+
+
+def is_youtube_url(url: str) -> bool:
+    hostname = (urllib.parse.urlparse(url).hostname or "").lower()
+    return hostname in YOUTUBE_HOSTS or hostname in YOUTU_BE_HOSTS
+
 
 def get_youtube_video_id(url: str) -> str:
     parsed = urllib.parse.urlparse(url)
-    if parsed.hostname == "youtu.be":
-        return parsed.path[1:]
-    if parsed.hostname in ("www.youtube.com", "youtube.com", "m.youtube.com"):
+    hostname = (parsed.hostname or "").lower()
+    video_id = None
+
+    if hostname in YOUTU_BE_HOSTS:
+        video_id = parsed.path.lstrip("/").split("/")[0]
+    elif hostname in YOUTUBE_HOSTS:
         if parsed.path == "/watch":
-            return urllib.parse.parse_qs(parsed.query)["v"][0]
-        elif parsed.path.startswith("/shorts/"):
-            return parsed.path.split("/")[2]
-    raise ValueError("Invalid YouTube URL")
+            video_id = urllib.parse.parse_qs(parsed.query).get("v", [None])[0]
+        else:
+            parts = parsed.path.strip("/").split("/")
+            if len(parts) >= 2 and parts[0] in ("shorts", "embed", "live", "v"):
+                video_id = parts[1]
+
+    if not video_id:
+        raise ValueError("Invalid YouTube URL: could not find a video ID.")
+    return video_id
+
 
 def get_video_description(url: str) -> str:
     """Fetches the YouTube video description using yt-dlp."""
@@ -32,7 +41,7 @@ def get_video_description(url: str) -> str:
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
-            return info.get('description', '')
+            return info.get('description') or ''
     except Exception:
         return ""
 
@@ -76,7 +85,7 @@ def _attempt_ai_extraction(text_content: str, client: OpenAI, model: str) -> dic
 def extract_recipe_from_youtube(url: str) -> dict:
     video_id = get_youtube_video_id(url)
     client = get_openai_client()
-    target_model = os.getenv("AI_MODEL_NAME", "gpt-4o")
+    target_model = get_openai_model("OPENAI_YOUTUBE_MODEL", default="gpt-4o")
 
     # Step A: Try the description first to save time and tokens
     description = get_video_description(url)

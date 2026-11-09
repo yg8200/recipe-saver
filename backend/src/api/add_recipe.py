@@ -43,6 +43,11 @@ def add_recipe():
     if not isinstance(instructions, list) or len(instructions) == 0:
         return jsonify({"error": "'instructions' is required"}), 400
 
+    for field in ["prep_time_minutes", "cook_time_minutes", "servings"]:
+        val = data.get(field)
+        if val is not None and (not isinstance(val, int) or isinstance(val, bool) or val < 0):
+            return jsonify({"error": f"'{field}' must be a non-negative integer or null"}), 400
+
     try:
         new_recipe = Recipe(
             title=title,

@@ -1,26 +1,11 @@
 import json
-import os
 import io
-from dotenv import load_dotenv
 from PIL import Image
-from google import genai
 from google.genai import types
 
-# Import your new utility function
 from src.utils.image_processing import process_and_compress_image
+from src.services.ai_client import get_gemini_client, get_gemini_model
 
-load_dotenv()
-
-def get_gemini_client() -> genai.Client:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY is not set in your .env file.")
-    
-    # Force the client to use the v1beta API version to enable JSON mode
-    return genai.Client(
-        api_key=api_key, 
-        http_options={'api_version': 'v1beta'}
-    )
 
 def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
     # 1. Pass the raw bytes to your new compression module
@@ -54,7 +39,7 @@ def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
     """
 
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model=get_gemini_model(),
         contents=[system_prompt, pil_image],
         config=types.GenerateContentConfig(
             response_mime_type="application/json",

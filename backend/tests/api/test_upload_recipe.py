@@ -13,7 +13,9 @@ def test_upload_recipe_image_success(client):
     }
 
     # Patch the extractor function exactly where it is imported in the API route
-    with patch('src.api.upload_recipe.extract_recipe_from_image', return_value=mock_extracted_data) as mock_extract:
+    # Also patch the AI corrector so the test never calls the real OpenAI API
+    with patch('src.api.upload_recipe.extract_recipe_from_image', return_value=mock_extracted_data) as mock_extract, \
+         patch('src.api.upload_recipe.correct_recipe_text', side_effect=lambda data: data):
         # Create a fake file in memory
         data = {
             'image': (io.BytesIO(b"fake_image_bytes_for_testing"), 'test_recipe.jpg')
@@ -21,7 +23,7 @@ def test_upload_recipe_image_success(client):
 
         # Send the multipart/form-data request
         response = client.post(
-            '/api/recipes/upload',
+            '/recipes/upload',
             data=data,
             content_type='multipart/form-data'
         )
@@ -43,7 +45,7 @@ def test_upload_recipe_image_success(client):
 
 def test_upload_recipe_missing_image_file(client):
     # Send a POST request with no file attached
-    response = client.post('/api/recipes/upload')
+    response = client.post('/recipes/upload')
 
     assert response.status_code == 400
     data = response.get_json()
@@ -57,7 +59,7 @@ def test_upload_recipe_empty_filename(client):
     }
     
     response = client.post(
-        '/api/recipes/upload',
+        '/recipes/upload',
         data=data,
         content_type='multipart/form-data'
     )
@@ -75,10 +77,39 @@ def test_upload_recipe_internal_error(client):
         }
         
         response = client.post(
-            '/api/recipes/upload',
+            '/recipes/upload',
             data=data,
             content_type='multipart/form-data'
         )
         
         assert response.status_code == 500
         assert response.get_json()["error"] == "OpenAI API failed"
+
+def test_upload_recipe_invalid_image_returns_400(client):
+    # Real (unmocked) image processing should reject bytes that are not an image
+    data = {'image': (io.BytesIO(b"definitely not an image"), 'test.jpg')}
+    response = client.post('/recipes/upload', data=data, content_type='multipart/form-data')
+    assert response.status_code == 400
+
+
+def test_upload_recipe_saves_raw_ocr_when_corrector_fails(client):
+    raw = {"title": "Raw Cake", "ingredients": ["flour"], "instructions": ["bake"], "cook_time": 30}
+    with patch('src.api.upload_recipe.extract_recipe_from_image', return_value=raw), \
+         patch('src.api.upload_recipe.correct_recipe_text', side_effect=Exception("OpenAI down")):
+        data = {'image': (io.BytesIO(b"img"), 'test.jpg')}
+        response = client.post('/recipes/upload', data=data, content_type='multipart/form-data')
+
+    assert response.status_code == 201
+    assert response.get_json()["title"] == "Raw Cake"
+    assert response.get_json()["cook_time_minutes"] == 30
+
+
+def test_upload_recipe_saves_raw_ocr_when_corrector_breaks_structure(client):
+    raw = {"title": "Raw Bread", "ingredients": ["flour"], "instructions": ["knead"]}
+    with patch('src.api.upload_recipe.extract_recipe_from_image', return_value=raw), \
+         patch('src.api.upload_recipe.correct_recipe_text', return_value={"recipe": "oops"}):
+        data = {'image': (io.BytesIO(b"img"), 'test.jpg')}
+        response = client.post('/recipes/upload', data=data, content_type='multipart/form-data')
+
+    assert response.status_code == 201
+    assert response.get_json()["title"] == "Raw Bread"

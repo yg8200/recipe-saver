@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from pydantic import BaseModel
 from sqlalchemy import func
 from src.core.database import db
 from src.models.recipe import Recipe
@@ -6,12 +7,25 @@ from src.models.recipe import Recipe
 # Ensure these imports match your actual file names
 from src.services.scraper import scrape_recipe_page
 from src.services.ai_extractor import extract_recipe_from_text
-from src.services.youtube_extractor import extract_recipe_from_youtube
+from src.services.youtube_extractor import extract_recipe_from_youtube, is_youtube_url
 
 extract_recipe_bp = Blueprint("extract_recipe", __name__)
 
-def validate_extracted_recipe(data: dict) -> dict:
+def _optional_non_negative_int(data: dict, *keys: str) -> int | None:
+    """Returns the first non-negative int found under any of the given keys, else None."""
+    for key in keys:
+        value = data.get(key)
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            return value
+    return None
+
+
+def validate_extracted_recipe(data) -> dict:
     """Validates and cleans the AI extracted recipe data."""
+    # The URL extractor returns a Pydantic model; the image/YouTube extractors return dicts.
+    if isinstance(data, BaseModel):
+        data = data.model_dump()
+
     if not isinstance(data, dict):
         raise ValueError("AI did not return a valid JSON object.")
 
@@ -20,34 +34,43 @@ def validate_extracted_recipe(data: dict) -> dict:
         raise ValueError("Extraction failed: Could not find a valid recipe title.")
 
     ingredients = data.get("ingredients")
-    if not isinstance(ingredients, list) or len(ingredients) == 0:
+    if not isinstance(ingredients, list):
+        raise ValueError("Extraction failed: No ingredients were found in this source.")
+    ingredients = [str(i).strip() for i in ingredients if i is not None and str(i).strip()]
+    if not ingredients:
         raise ValueError("Extraction failed: No ingredients were found in this source.")
 
     instructions = data.get("instructions")
-    if not isinstance(instructions, list) or len(instructions) == 0:
+    if not isinstance(instructions, list):
+        raise ValueError("Extraction failed: No instructions were found in this source.")
+    instructions = [str(i).strip() for i in instructions if i is not None and str(i).strip()]
+    if not instructions:
         raise ValueError("Extraction failed: No instructions were found in this source.")
 
+    # Extractors use either "prep_time" or "prep_time_minutes" naming; accept both.
     return {
-        "title": title.strip(),
-        "ingredients": [str(i).strip() for i in ingredients if str(i).strip()],
-        "instructions": [str(i).strip() for i in instructions if str(i).strip()],
-        "prep_time_minutes": data.get("prep_time") if isinstance(data.get("prep_time"), int) else None,
-        "cook_time_minutes": data.get("cook_time") if isinstance(data.get("cook_time"), int) else None,
-        "servings": data.get("servings") if isinstance(data.get("servings"), int) else None,
+        "title": title.strip()[:255],
+        "ingredients": ingredients,
+        "instructions": instructions,
+        "prep_time_minutes": _optional_non_negative_int(data, "prep_time_minutes", "prep_time"),
+        "cook_time_minutes": _optional_non_negative_int(data, "cook_time_minutes", "cook_time"),
+        "servings": _optional_non_negative_int(data, "servings"),
     }
 
 
 @extract_recipe_bp.post("/recipes/extract")
 def extract_recipe():
-    data = request.get_json() or {}
-    url = data.get("url")
+    data = request.get_json(silent=True)
+    url = data.get("url") if isinstance(data, dict) else None
 
-    if not url:
+    if not isinstance(url, str) or not url.strip():
         return jsonify({"error": "The 'url' field is required in the JSON body"}), 400
+
+    url = url.strip()
 
     try:
         # Route to the correct extraction service
-        if "youtube.com" in url or "youtu.be" in url:
+        if is_youtube_url(url):
             # The YouTube extractor now handles description vs transcript logic internally
             raw_extracted = extract_recipe_from_youtube(url)
         else:
@@ -79,6 +102,7 @@ def extract_recipe():
         return jsonify(new_recipe.to_dict()), 201
 
     except ValueError as ve:
+        db.session.rollback()
         # Gracefully catches our "has_recipe is false" errors and missing transcripts
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
