@@ -2,97 +2,666 @@
   "info": {
     "name": "Recipe Saver API",
     "_postman_id": "7d9e4a3b-18f2-491c-b3a1-7c5f891b9201",
-    "description": "API collection for local Recipe Saver testing",
-    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+    "description": "All endpoints of the local Recipe Saver backend.\n\n- `baseUrl` defaults to http://127.0.0.1:5001 (change it under the collection's Variables tab).\n- Every request that creates a recipe (manual, URL, YouTube, image) saves the new id into `recipeId`, so Get / Update / Delete act on the last recipe you created.\n- Titles are unique: creating the same recipe twice returns 409. Delete it first or change the title.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5001"
+    },
+    {
+      "key": "recipeId",
+      "value": "1"
+    }
+  ],
   "item": [
     {
-      "name": "1. Health Check",
+      "name": "Health Check",
       "request": {
-        "url": "http://127.0.0.1:5001/health",
         "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "description": ""
-          }
-        ],
-        "description": "Check if the server is up and responsive"
-      },
-      "response": []
-    },
-    {
-      "name": "2. Get All Recipes",
-      "request": {
-        "url": "http://127.0.0.1:5001/recipes",
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "description": ""
-          }
-        ],
-        "description": "Fetch all saved recipes from PostgreSQL"
-      },
-      "response": []
-    },
-    {
-      "name": "3. Add Recipe (Manual)",
-      "request": {
-        "url": "http://127.0.0.1:5001/recipes",
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "description": ""
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"title\": \"Classic Shakshuka\",\n  \"ingredients\": [\n    \"4 eggs\",\n    \"4 ripe tomatoes\",\n    \"1 red bell pepper\",\n    \"2 cloves garlic\",\n    \"1 tsp cumin\",\n    \"2 tbsp olive oil\"\n  ],\n  \"instructions\": [\n    \"Saute peppers and garlic.\",\n    \"Add tomatoes and simmer until thick.\",\n    \"Crack eggs and cook until whites set.\"\n  ],\n  \"prep_time_minutes\": 10,\n  \"cook_time_minutes\": 20,\n  \"servings\": 3\n}"
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
         },
-        "description": "Create a new recipe manually"
+        "description": "Check that the server is up."
       },
-      "response": []
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "4. Extract Recipe with AI",
-      "request": {
-        "url": "http://127.0.0.1:5001/recipes/extract",
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "description": ""
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"url\": \"https://sallysbakingaddiction.com/easy-homemade-soft-pretzels/\"\n}"
+      "name": "Recipes (CRUD)",
+      "item": [
+        {
+          "name": "Get All Recipes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes"
+              ]
+            },
+            "description": "List every saved recipe."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
         },
-        "description": "Scrape a website URL and extract structured recipe fields using OpenAI"
-      },
-      "response": []
+        {
+          "name": "Get Recipe by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/{{recipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "{{recipeId}}"
+              ]
+            },
+            "description": "Fetch one recipe. Returns 404 if the id does not exist."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Recipe (Manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes"
+              ]
+            },
+            "description": "Create a recipe manually. `title`, `ingredients` and `instructions` are required; the time/servings fields must be non-negative integers or null. Returns 409 if the title exists.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Classic Shakshuka\",\n  \"ingredients\": [\n    \"4 eggs\",\n    \"4 ripe tomatoes\",\n    \"1 red bell pepper\",\n    \"2 cloves garlic\",\n    \"1 tsp cumin\",\n    \"2 tbsp olive oil\"\n  ],\n  \"instructions\": [\n    \"Saute peppers and garlic.\",\n    \"Add tomatoes and simmer until thick.\",\n    \"Crack eggs and cook until whites set.\"\n  ],\n  \"prep_time_minutes\": 10,\n  \"cook_time_minutes\": 20,\n  \"servings\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 or 409', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('recipeId', pm.response.json().id);",
+                  "    console.log('Saved recipeId =', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Recipe (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/{{recipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "{{recipeId}}"
+              ]
+            },
+            "description": "Update a recipe. Only the fields you send are changed (PUT and PATCH behave the same). Returns 409 if the new title belongs to another recipe.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Spicy Shakshuka\",\n  \"ingredients\": [\n    \"4 eggs\",\n    \"4 ripe tomatoes\",\n    \"1 red bell pepper\",\n    \"2 cloves garlic\",\n    \"1 tsp cumin\",\n    \"2 tbsp olive oil\"\n  ],\n  \"instructions\": [\n    \"Saute peppers and garlic.\",\n    \"Add tomatoes and simmer until thick.\",\n    \"Crack eggs and cook until whites set.\"\n  ],\n  \"prep_time_minutes\": 10,\n  \"cook_time_minutes\": 20,\n  \"servings\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Recipe (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/{{recipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "{{recipeId}}"
+              ]
+            },
+            "description": "Partially update a recipe, e.g. just the cooking time.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cook_time_minutes\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Recipe by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/{{recipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "{{recipeId}}"
+              ]
+            },
+            "description": "Delete a recipe by its id."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     },
     {
-      "name": "5. Delete Recipe by ID",
-      "request": {
-        "url": "http://127.0.0.1:5001/recipes/1",
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "description": ""
-          }
-        ],
-        "description": "Delete a recipe record by its primary key ID"
-      },
-      "response": []
+      "name": "AI Extraction",
+      "item": [
+        {
+          "name": "Extract from Website URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/extract",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "extract"
+              ]
+            },
+            "description": "Scrape a recipe web page and extract it with OpenAI, then save it.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://sallysbakingaddiction.com/easy-homemade-soft-pretzels/\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 or 400 or 409', () => pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('recipeId', pm.response.json().id);",
+                  "    console.log('Saved recipeId =', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Extract from YouTube Video",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/extract",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "extract"
+              ]
+            },
+            "description": "Extract a recipe from a YouTube video (watch, youtu.be, shorts, embed and live links work). Uses the description first; the transcript is only used to fill in missing parts.\n\nReplace VIDEO_ID with a real cooking video before sending.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=VIDEO_ID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 or 400 or 409', () => pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('recipeId', pm.response.json().id);",
+                  "    console.log('Saved recipeId =', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Extract from Image (Upload)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "upload"
+              ]
+            },
+            "description": "Upload a photo of a printed recipe (JPEG, PNG or HEIC). Gemini reads the text, OpenAI fixes OCR typos, then it is saved.\n\nIn the Body tab, click 'Select Files' next to the `image` key and choose a photo. Takes ~10-15 seconds.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "The recipe photo"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 or 400 or 409', () => pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]));",
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('recipeId', pm.response.json().id);",
+                  "    console.log('Saved recipeId =', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Add Recipe - Missing Fields (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes"
+              ]
+            },
+            "description": "Missing ingredients/instructions.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Incomplete\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.expect(pm.response.code).to.be.oneOf([400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Recipe - Bad Number (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes"
+              ]
+            },
+            "description": "Non-integer prep time is rejected.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bad Times\",\n  \"ingredients\": [\n    \"x\"\n  ],\n  \"instructions\": [\n    \"y\"\n  ],\n  \"prep_time_minutes\": \"ten\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.expect(pm.response.code).to.be.oneOf([400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Extract - Missing URL (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/extract",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "extract"
+              ]
+            },
+            "description": "Body without a url.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.expect(pm.response.code).to.be.oneOf([400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Extract - Invalid YouTube URL (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/extract",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "extract"
+              ]
+            },
+            "description": "YouTube link with no video id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://www.youtube.com/watch?list=abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.expect(pm.response.code).to.be.oneOf([400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload - No Image (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "upload"
+              ]
+            },
+            "description": "Multipart request without the image field.",
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.expect(pm.response.code).to.be.oneOf([400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recipe - Not Found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "999999"
+              ]
+            },
+            "description": "Id that does not exist."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', () => pm.expect(pm.response.code).to.be.oneOf([404]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
