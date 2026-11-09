@@ -27,6 +27,7 @@ def correct_recipe_text(recipe_json: dict) -> dict:
     2. Fix and organize the numbering of the instructions so they are clean, sequential, and consistent.
     3. DO NOT add ingredients or steps that were not in the original text. Do not invent a new recipe.
     4. Keep the exact same JSON structure.
+    5. Validate the Hebrew sntax so numbers, units, and culinary terms are correct and well ordered.
     
     Return ONLY a valid JSON object with the corrected Hebrew text.
     """
