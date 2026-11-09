@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+/*
+  Design tokens. In Tailwind v4 the theme lives in CSS: every --color-* variable here
+  becomes a utility class automatically, e.g. --color-brand-600 -> bg-brand-600, text-brand-600.
+*/
+@theme {
+  --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
+
+  /* Warm tomato/paprika brand color */
+  --color-brand-50: #fff4ed;
+  --color-brand-100: #ffe6d4;
+  --color-brand-200: #ffc9a8;
+  --color-brand-500: #f0642e;
+  --color-brand-600: #dc4a17;
+  --color-brand-700: #b53813;
+
+  /* Warm neutral for backgrounds and text */
+  --color-cream: #fbf8f4;
+  --color-ink: #2b2420;
+}
+
+body {
+  @apply bg-cream text-ink antialiased;
+}
