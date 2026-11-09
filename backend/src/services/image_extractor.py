@@ -4,7 +4,7 @@ from PIL import Image
 from google.genai import types
 
 from src.utils.image_processing import process_and_compress_image
-from src.services.ai_client import get_gemini_client, get_gemini_model
+from src.services.ai_client import get_gemini_client, get_gemini_model, get_gemini_thinking_config
 
 
 def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
@@ -38,12 +38,14 @@ def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
     }
     """
 
+    model = get_gemini_model()
     response = client.models.generate_content(
-        model=get_gemini_model(),
+        model=model,
         contents=[system_prompt, pil_image],
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
             temperature=0.0,
+            thinking_config=get_gemini_thinking_config(model),
         ),
     )
 

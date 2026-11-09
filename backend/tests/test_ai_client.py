@@ -15,7 +15,7 @@ def test_openai_model_resolution(monkeypatch):
 
 def test_gemini_model_default_and_override(monkeypatch):
     monkeypatch.delenv("GEMINI_MODEL_NAME", raising=False)
-    assert ai_client.get_gemini_model() == "gemini-2.5-flash"
+    assert ai_client.get_gemini_model() == "gemini-3.8-flash"
     monkeypatch.setenv("GEMINI_MODEL_NAME", "gemini-other")
     assert ai_client.get_gemini_model() == "gemini-other"
 
@@ -27,3 +27,13 @@ def test_missing_keys_raise(monkeypatch):
         ai_client.get_openai_client()
     with pytest.raises(RuntimeError):
         ai_client.get_gemini_client()
+
+
+def test_gemini_thinking_config(monkeypatch):
+    monkeypatch.delenv("GEMINI_THINKING_LEVEL", raising=False)
+    assert ai_client.get_gemini_thinking_config("gemini-3.8-flash").thinking_level == "LOW"
+    assert ai_client.get_gemini_thinking_config("gemini-2.5-flash").thinking_budget == 0
+    monkeypatch.setenv("GEMINI_THINKING_LEVEL", "high")
+    assert ai_client.get_gemini_thinking_config("gemini-3.8-flash").thinking_level == "HIGH"
+    monkeypatch.setenv("GEMINI_THINKING_LEVEL", "default")
+    assert ai_client.get_gemini_thinking_config("gemini-3.8-flash") is None
