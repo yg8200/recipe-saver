@@ -1,3 +1,4 @@
+# Deleting an existing recipe removes it and returns the deleted data.
 def test_delete_recipe_success(client):
     create_payload = {
         "title": "Pancakes",
@@ -20,6 +21,7 @@ def test_delete_recipe_success(client):
     assert second_delete_res.status_code == 404
 
 
+# Deleting a recipe id that doesn't exist returns 404.
 def test_delete_recipe_not_found(client):
     response = client.delete("/recipes/999")
 
@@ -28,6 +30,7 @@ def test_delete_recipe_not_found(client):
     assert data["error"] == "Recipe with id 999 not found"
 
 
+# Deleting with a non-numeric id returns 404.
 def test_delete_recipe_invalid_id_type(client):
     response = client.delete("/recipes/not-a-number")
 

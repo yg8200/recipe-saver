@@ -11,6 +11,7 @@ RECIPE = {
 }
 
 
+# Corrections replace only the lines they point to and never mutate the original recipe.
 def test_apply_corrections_changes_only_listed_lines():
     result = rc.apply_corrections(RECIPE, [
         {"section": "title", "index": 0, "text": "פאי תפוחים"},
@@ -23,6 +24,7 @@ def test_apply_corrections_changes_only_listed_lines():
     assert RECIPE["title"] == "באי תפוחים"  # original not mutated
 
 
+# Corrections with bad indexes, unknown sections, empty text or wrong types are ignored.
 def test_apply_corrections_ignores_invalid_entries():
     result = rc.apply_corrections(RECIPE, [
         {"section": "ingredients", "index": 99, "text": "out of range"},
@@ -34,6 +36,7 @@ def test_apply_corrections_ignores_invalid_entries():
     assert result == RECIPE
 
 
+# With no AI corrections the recipe is unchanged (except deterministic renumbering), and lines are sent to the AI with indexes.
 def test_correct_recipe_text_with_no_corrections_returns_original():
     reply = MagicMock()
     reply.choices[0].message.content = json.dumps({"corrections": []})
@@ -47,21 +50,25 @@ def test_correct_recipe_text_with_no_corrections_returns_original():
     assert sent["instructions"][1] == {"index": 1, "text": "3. שמים במקרה"}
 
 
+# Steps numbered 1..n across section headers are already correct and must not be renumbered.
 def test_numbering_with_section_headers_is_left_alone():
     steps = ["--- מכינים את התפוחים ---", "1. a", "2. b", "--- שכבת השקדים ---", "3. c", "4. d"]
     assert rc.normalize_step_numbering(steps) == steps
 
 
+# Steps that restart at 1 in each section are valid and must not be renumbered.
 def test_numbering_restarting_per_section_is_left_alone():
     steps = ["--- א ---", "1. a", "2. b", "--- ב ---", "1. c", "2. d"]
     assert rc.normalize_step_numbering(steps) == steps
 
 
+# Skipped or duplicate step numbers are renumbered 1..n, leaving headers and unnumbered lines alone.
 def test_broken_numbering_is_renumbered():
     steps = ["1. a", "3. b", "--- header ---", "3) c", "unnumbered note"]
     assert rc.normalize_step_numbering(steps) == ["1. a", "2. b", "--- header ---", "3. c", "unnumbered note"]
 
 
+# Instructions without step numbers are returned unchanged.
 def test_unnumbered_steps_are_untouched():
     steps = ["mix", "bake"]
     assert rc.normalize_step_numbering(steps) == steps

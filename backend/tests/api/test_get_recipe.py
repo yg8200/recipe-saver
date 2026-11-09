@@ -1,3 +1,4 @@
+# Listing recipes on an empty database returns an empty list.
 def test_get_all_recipes_empty(client):
     response = client.get("/recipes")
 
@@ -7,6 +8,7 @@ def test_get_all_recipes_empty(client):
     assert len(data) == 0
 
 
+# Listing recipes returns every saved recipe.
 def test_get_all_recipes_with_data(client):
     client.post("/recipes", json={
         "title": "Salad",
@@ -28,6 +30,7 @@ def test_get_all_recipes_with_data(client):
     assert data[1]["title"] == "Omelette"
 
 
+# Fetching a recipe by id returns that recipe.
 def test_get_recipe_by_id_success(client):
     create_res = client.post("/recipes", json={
         "title": "Pasta",
@@ -44,6 +47,7 @@ def test_get_recipe_by_id_success(client):
     assert data["title"] == "Pasta"
 
 
+# Fetching a recipe id that doesn't exist returns 404.
 def test_get_recipe_by_id_not_found(client):
     response = client.get("/recipes/999")
 
@@ -52,6 +56,7 @@ def test_get_recipe_by_id_not_found(client):
     assert data["error"] == "Recipe with id 999 not found"
 
 
+# Fetching with a non-numeric id returns 404.
 def test_get_recipe_by_id_invalid_type(client):
     response = client.get("/recipes/invalid-id")
 

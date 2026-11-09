@@ -31,6 +31,7 @@ def run(client, description, ai_replies, transcript="spoken text", transcript_er
         return yt.extract_recipe_from_youtube(URL), fetch
 
 
+# When the description has ingredients and instructions, it is used as-is and the transcript is never fetched.
 def test_full_recipe_in_description_skips_transcript(client):
     result, fetch = run(client, "desc", [ai_reply(title="Cake", ingredients=["flour"], instructions=["bake"])])
     assert result["instructions"] == ["bake"]
@@ -38,6 +39,7 @@ def test_full_recipe_in_description_skips_transcript(client):
     assert client.chat.completions.create.call_count == 1
 
 
+# When the description has only ingredients, the transcript fills in the instructions while the description's ingredients and title are kept.
 def test_ingredients_only_uses_transcript_for_instructions(client):
     result, fetch = run(client, "desc", [
         ai_reply(title="Cake", ingredients=["200g flour", "2 eggs"], servings=8),
@@ -54,6 +56,7 @@ def test_ingredients_only_uses_transcript_for_instructions(client):
     assert "200g flour" in system_prompt
 
 
+# When the description has no recipe, the whole recipe comes from the transcript (without partial-recipe context).
 def test_no_recipe_in_description_uses_transcript(client):
     result, _ = run(client, "subscribe!", [
         ai_reply(),
@@ -64,18 +67,21 @@ def test_no_recipe_in_description_uses_transcript(client):
     assert "CONTEXT" not in second_prompt
 
 
+# An empty description skips the AI call on it and goes straight to the transcript.
 def test_empty_description_skips_first_ai_call(client):
     result, _ = run(client, "", [ai_reply(title="Soup", ingredients=["water"], instructions=["boil"])])
     assert result["title"] == "Soup"
     assert client.chat.completions.create.call_count == 1
 
 
+# Ingredients-only description plus an unavailable transcript raises an error saying the instructions are missing.
 def test_ingredients_only_and_no_transcript_raises_clear_error(client):
     with pytest.raises(ValueError, match="no instructions"):
         run(client, "desc", [ai_reply(title="Cake", ingredients=["flour"])],
             transcript_error=ValueError("disabled"))
 
 
+# If even the transcript can't provide instructions, extraction fails instead of saving half a recipe.
 def test_transcript_without_instructions_raises(client):
     with pytest.raises(ValueError, match="complete recipe"):
         run(client, "desc", [ai_reply(title="Cake", ingredients=["flour"]), ai_reply(ingredients=["flour"])])

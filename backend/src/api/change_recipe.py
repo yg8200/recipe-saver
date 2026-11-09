@@ -18,38 +18,41 @@ def update_recipe(recipe_id: int):
     if recipe is None:
         return jsonify({"error": f"Recipe with id {recipe_id} not found"}), 404
 
+    # Validate everything first and only then touch the recipe, so a rejected
+    # request never leaves half-applied changes in the session.
+    updates = {}
+
     if "title" in data:
         title = data["title"]
         if not isinstance(title, str) or not title.strip():
             return jsonify({"error": "'title' must be a non-empty string"}), 400
-        title = title.strip()
-        existing = (
-            db.session.query(Recipe)
-            .filter(func.lower(Recipe.title) == title.lower(), Recipe.id != recipe_id)
-            .first()
-        )
-        if existing:
-            return jsonify({"error": f"A recipe with the title '{title}' already exists."}), 409
-        recipe.title = title
+        updates["title"] = title.strip()
 
-    if "ingredients" in data:
-        ingredients = data["ingredients"]
-        if not isinstance(ingredients, list) or len(ingredients) == 0:
-            return jsonify({"error": "'ingredients' must be a non-empty list"}), 400
-        recipe.ingredients = ingredients
-
-    if "instructions" in data:
-        instructions = data["instructions"]
-        if not isinstance(instructions, list) or len(instructions) == 0:
-            return jsonify({"error": "'instructions' must be a non-empty list"}), 400
-        recipe.instructions = instructions
+    for field in ["ingredients", "instructions"]:
+        if field in data:
+            value = data[field]
+            if not isinstance(value, list) or len(value) == 0:
+                return jsonify({"error": f"'{field}' must be a non-empty list"}), 400
+            updates[field] = value
 
     for field in ["prep_time_minutes", "cook_time_minutes", "servings"]:
         if field in data:
             val = data[field]
             if val is not None and (not isinstance(val, int) or isinstance(val, bool) or val < 0):
                 return jsonify({"error": f"'{field}' must be a non-negative integer or null"}), 400
-            setattr(recipe, field, val)
+            updates[field] = val
+
+    if "title" in updates:
+        existing = (
+            db.session.query(Recipe)
+            .filter(func.lower(Recipe.title) == updates["title"].lower(), Recipe.id != recipe_id)
+            .first()
+        )
+        if existing:
+            return jsonify({"error": f"A recipe with the title '{updates['title']}' already exists."}), 409
+
+    for field, value in updates.items():
+        setattr(recipe, field, value)
 
     try:
         db.session.commit()
