@@ -2,8 +2,11 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import func
 from src.core.database import db
 from src.models.recipe import Recipe
+
+# Ensure these imports match your actual file names
 from src.services.scraper import scrape_recipe_page
 from src.services.ai_extractor import extract_recipe_from_text
+from src.services.youtube_extractor import extract_recipe_from_youtube
 
 extract_recipe_bp = Blueprint("extract_recipe", __name__)
 
@@ -43,13 +46,19 @@ def extract_recipe():
         return jsonify({"error": "The 'url' field is required in the JSON body"}), 400
 
     try:
-        # Standard webpage scraping
-        raw_text = scrape_recipe_page(url)
-        raw_extracted = extract_recipe_from_text(raw_text)
+        # Route to the correct extraction service
+        if "youtube.com" in url or "youtu.be" in url:
+            # The YouTube extractor now handles description vs transcript logic internally
+            raw_extracted = extract_recipe_from_youtube(url)
+        else:
+            # Standard webpage scraping
+            raw_text = scrape_recipe_page(url)
+            raw_extracted = extract_recipe_from_text(raw_text)
 
-        # Guardrail applied here before checking the database
+        # Apply the guardrail to ensure the AI actually found valid lists
         validated_data = validate_extracted_recipe(raw_extracted)
 
+        # Check for duplicates
         existing = (
             db.session.query(Recipe)
             .filter(func.lower(Recipe.title) == validated_data["title"].lower())
@@ -61,6 +70,7 @@ def extract_recipe():
                 "error": f"A recipe with the title '{validated_data['title']}' already exists (ID: {existing.id})."
             }), 409
 
+        # Save to database
         new_recipe = Recipe(**validated_data)
 
         db.session.add(new_recipe)
@@ -69,6 +79,7 @@ def extract_recipe():
         return jsonify(new_recipe.to_dict()), 201
 
     except ValueError as ve:
+        # Gracefully catches our "has_recipe is false" errors and missing transcripts
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         db.session.rollback()
