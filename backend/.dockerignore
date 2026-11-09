@@ -1,0 +1,12 @@
+# Files left out of the image build. Secrets (.env) are passed at runtime by docker-compose
+# instead of being baked into the image, and local virtualenvs/caches are never needed.
+.env
+.env.*
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
