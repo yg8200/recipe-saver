@@ -22,16 +22,16 @@ export default function RecipeListPage() {
     )
   }, [recipes, query])
 
-  if (isPending) return <Spinner label="Loading your recipes…" />
+  if (isPending) return <Spinner label="טוענים את המתכונים…" />
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-br from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-10">
+      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-bl from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-10">
         <div>
-          <h1 className="text-3xl font-bold sm:text-4xl">My recipes</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">המתכונים שלי</h1>
           <p className="mt-1 text-white/90">
-            {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'} saved · what are we cooking today?
+            {recipes.length === 1 ? 'מתכון אחד שמור' : `${recipes.length} מתכונים שמורים`} · מה מבשלים היום?
           </p>
         </div>
         {recipes.length > 0 && (
@@ -40,22 +40,22 @@ export default function RecipeListPage() {
             dir="auto"
             value={query}
             onChange={(e) => setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true })}
-            placeholder="Search by title or ingredient…"
-            aria-label="Search recipes"
+            placeholder="חיפוש לפי שם או מצרך…"
+            aria-label="חיפוש מתכונים"
             className={`${inputClass} border-transparent text-ink sm:max-w-xs`}
           />
         )}
       </div>
 
       {recipes.length === 0 ? (
-        <EmptyState title="Your cookbook is empty, for now">
-          Save your first recipe from a website, a YouTube video or a photo of grandma's handwriting.
+        <EmptyState title="ספר המתכונים שלך עדיין ריק">
+          שמרו את המתכון הראשון מאתר, מסרטון יוטיוב או מצילום של המתכון של סבתא.
           <div className="mt-4">
-            <Link to="/add" className="font-medium text-brand-700 underline">Add a recipe</Link>
+            <Link to="/add" className="font-medium text-brand-700 underline">הוספת מתכון</Link>
           </div>
         </EmptyState>
       ) : filtered.length === 0 ? (
-        <EmptyState title="No matches">Nothing matches “{query}”.</EmptyState>
+        <EmptyState title="לא נמצאו תוצאות">אין מתכון שמתאים ל־“{query}”.</EmptyState>
       ) : (
         <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {filtered.map((recipe) => (

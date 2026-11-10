@@ -4,7 +4,6 @@ import { useDeleteRecipe, useRecipe } from '../api/recipes'
 import { secondaryButtonClass } from '../components/RecipeForm'
 import RecipeMeta from '../components/RecipeMeta'
 import { ErrorMessage, Spinner } from '../components/StatusViews'
-import { textDirection } from '../utils/textDirection'
 import NotFoundPage from './NotFoundPage'
 
 // Section header lines look like "--- לשכבת השקדים ---"; strip the dashes for display
@@ -28,28 +27,28 @@ export default function RecipeDetailPage() {
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />
 
   function handleDelete(title: string) {
-    if (!window.confirm(`Delete "${title}"? This can't be undone.`)) return
+    if (!window.confirm(`למחוק את “${title}”? אי אפשר לבטל את הפעולה.`)) return
     deleteRecipe.mutate(id, { onSuccess: () => navigate('/') })
   }
 
   return (
-    <article dir={textDirection(recipe.title)} className="space-y-8 sm:space-y-10">
+    <article className="space-y-8 sm:space-y-10">
       <div className="flex flex-col gap-4 rounded-3xl border border-brand-100 bg-surface p-6 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-8">
         <div className="space-y-3">
           <Link to="/" className="text-sm text-ink/60 hover:text-ink">
-            <span className="inline-block rtl:rotate-180">←</span> All recipes
+            <span className="inline-block rtl:rotate-180">←</span> כל המתכונים
           </Link>
-          <h1 className="text-3xl font-bold leading-tight">{recipe.title}</h1>
+          <h1 dir="auto" className="text-3xl font-bold leading-tight">{recipe.title}</h1>
           <RecipeMeta recipe={recipe} />
         </div>
         <div className="flex shrink-0 gap-2">
-          <Link to={`/recipes/${id}/edit`} className={secondaryButtonClass}>Edit</Link>
+          <Link to={`/recipes/${id}/edit`} className={secondaryButtonClass}>עריכה</Link>
           <button
             onClick={() => handleDelete(recipe.title)}
             disabled={deleteRecipe.isPending}
             className="rounded-xl border border-danger-line bg-surface px-5 py-2.5 pointer-coarse:py-3 font-medium text-danger transition hover:bg-danger-bg disabled:opacity-60"
           >
-            {deleteRecipe.isPending ? 'Deleting…' : 'Delete'}
+            {deleteRecipe.isPending ? 'מוחק…' : 'מחיקה'}
           </button>
         </div>
       </div>
@@ -58,13 +57,13 @@ export default function RecipeDetailPage() {
 
       <div className="grid gap-6 sm:gap-8 md:grid-cols-[1fr_2fr]">
         <section className="h-fit rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold">Ingredients</h2>
+          <h2 className="mb-4 text-lg font-semibold">מצרכים</h2>
           <ul className="space-y-2">
             {recipe.ingredients.map((line, i) =>
               headerText(line) !== null ? (
                 <li key={i} className="pt-2 text-sm font-semibold text-herb-700">{headerText(line)}</li>
               ) : (
-                <li key={i} className="flex gap-2">
+                <li key={i} dir="auto" className="flex gap-2">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-herb-500" />
                   {line}
                 </li>
@@ -74,13 +73,13 @@ export default function RecipeDetailPage() {
         </section>
 
         <section className="rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold">Steps</h2>
+          <h2 className="mb-4 text-lg font-semibold">אופן הכנה</h2>
           <ol className="space-y-4 leading-relaxed">
             {recipe.instructions.map((line, i) =>
               headerText(line) !== null ? (
                 <li key={i} className="pt-2 font-semibold text-brand-700">{headerText(line)}</li>
               ) : (
-                <li key={i} className="flex gap-3">
+                <li key={i} dir="auto" className="flex gap-3">
                   <span aria-hidden className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
                     {stepNumber(recipe.instructions, i)}
                   </span>

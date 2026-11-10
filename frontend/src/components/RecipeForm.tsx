@@ -29,12 +29,12 @@ const toNumber = (text: string) => (text.trim() === '' ? null : Number(text))
 // Same rules the backend enforces. Checking here too gives instant feedback without a round trip;
 // the backend check still matters because anyone can call the API directly.
 function validate(values: FormValues): string | null {
-  if (!values.title.trim()) return 'Please give the recipe a title.'
-  if (toLines(values.ingredients).length === 0) return 'Add at least one ingredient.'
-  if (toLines(values.instructions).length === 0) return 'Add at least one step.'
+  if (!values.title.trim()) return 'נא לתת למתכון שם.'
+  if (toLines(values.ingredients).length === 0) return 'נא להוסיף לפחות מצרך אחד.'
+  if (toLines(values.instructions).length === 0) return 'נא להוסיף לפחות שלב אחד.'
   for (const field of ['prep_time_minutes', 'cook_time_minutes', 'servings'] as const) {
     const n = toNumber(values[field])
-    if (n !== null && (!Number.isInteger(n) || n < 0)) return 'Times and servings must be whole numbers.'
+    if (n !== null && (!Number.isInteger(n) || n < 0)) return 'זמנים ומספר מנות חייבים להיות מספרים שלמים.'
   }
   return null
 }
@@ -77,29 +77,29 @@ export default function RecipeForm({ initialRecipe, submitLabel, isSubmitting, s
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <Field label="Title">
-        <input dir="auto" value={values.title} onChange={update('title')} className={inputClass} placeholder="Classic Shakshuka" />
+      <Field label="שם המתכון">
+        <input dir="auto" value={values.title} onChange={update('title')} className={inputClass} placeholder="שקשוקה קלאסית" />
       </Field>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Ingredients" hint="One per line">
+        <Field label="מצרכים" hint="אחד בכל שורה">
           <textarea dir="auto" rows={7} value={values.ingredients} onChange={update('ingredients')} className={inputClass}
-            placeholder={'4 eggs\n4 ripe tomatoes\n1 tsp cumin'} />
+            placeholder={'4 ביצים\n4 עגבניות בשלות\n1 כפית כמון'} />
         </Field>
-        <Field label="Steps" hint="One per line">
+        <Field label="אופן הכנה" hint="אחד בכל שורה">
           <textarea dir="auto" rows={7} value={values.instructions} onChange={update('instructions')} className={inputClass}
-            placeholder={'1. Sauté the peppers.\n2. Add tomatoes and simmer.'} />
+            placeholder={'1. מטגנים את הפלפלים.\n2. מוסיפים עגבניות ומבשלים.'} />
         </Field>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <Field label="Prep (min)">
+        <Field label="הכנה (דקות)">
           <input type="number" min={0} value={values.prep_time_minutes} onChange={update('prep_time_minutes')} className={inputClass} />
         </Field>
-        <Field label="Cook (min)">
+        <Field label="בישול (דקות)">
           <input type="number" min={0} value={values.cook_time_minutes} onChange={update('cook_time_minutes')} className={inputClass} />
         </Field>
-        <Field label="Servings">
+        <Field label="מנות">
           <input type="number" min={0} value={values.servings} onChange={update('servings')} className={inputClass} />
         </Field>
       </div>
@@ -110,10 +110,10 @@ export default function RecipeForm({ initialRecipe, submitLabel, isSubmitting, s
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
-          {isSubmitting ? 'Saving…' : submitLabel}
+          {isSubmitting ? 'שומר…' : submitLabel}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className={secondaryButtonClass}>Cancel</button>
+          <button type="button" onClick={onCancel} className={secondaryButtonClass}>ביטול</button>
         )}
       </div>
     </form>

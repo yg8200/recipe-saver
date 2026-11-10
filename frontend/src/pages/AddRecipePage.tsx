@@ -6,9 +6,9 @@ import RecipeForm, { inputClass, primaryButtonClass } from '../components/Recipe
 import { ErrorMessage } from '../components/StatusViews'
 
 const TABS = [
-  { id: 'link', icon: '🔗', label: 'From a link' },
-  { id: 'photo', icon: '📷', label: 'From a photo' },
-  { id: 'manual', icon: '✍️', label: 'Type it in' },
+  { id: 'link', icon: '🔗', label: 'מקישור' },
+  { id: 'photo', icon: '📷', label: 'מצילום' },
+  { id: 'manual', icon: '✍️', label: 'הקלדה' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
 
@@ -23,8 +23,8 @@ export default function AddRecipePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Add a recipe</h1>
-        <p className="mt-1 text-ink/60">Paste a link, snap a photo of a cookbook page, or type it yourself.</p>
+        <h1 className="text-3xl font-bold">הוספת מתכון</h1>
+        <p className="mt-1 text-ink/60">הדביקו קישור, צלמו דף מספר בישול או הקלידו בעצמכם.</p>
       </div>
 
       <div role="tablist" className="flex gap-1 rounded-2xl bg-brand-50 p-1">
@@ -78,13 +78,14 @@ function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-medium">Recipe website or YouTube video</span>
+        <span className="mb-1.5 block text-sm font-medium">אתר מתכונים או סרטון יוטיוב</span>
         <input
           type="url"
           required
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://…"
+          dir="ltr"
           disabled={extract.isPending}
           className={inputClass}
         />
@@ -93,15 +94,15 @@ function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
       {url && (
         <p className="text-sm text-ink/60">
           {youtube
-            ? '▶️ YouTube video: the recipe is read from the description, and the transcript fills in anything missing.'
-            : '🌐 Website: the page is read and the recipe is pulled out by AI.'}
+            ? '▶️ סרטון יוטיוב: המתכון נקרא מתיאור הסרטון, והתמלול משלים את מה שחסר.'
+            : '🌐 אתר: הדף נקרא והמתכון מחולץ באמצעות בינה מלאכותית.'}
         </p>
       )}
 
       {extract.isPending ? (
-        <Working message={() => (youtube ? 'Reading the video…' : 'Reading the page…')} />
+        <Working message={() => (youtube ? 'קוראים את הסרטון…' : 'קוראים את הדף…')} />
       ) : (
-        <button type="submit" className={primaryButtonClass}>Extract recipe</button>
+        <button type="submit" className={primaryButtonClass}>חילוץ מתכון</button>
       )}
 
       {extract.error && <ErrorMessage error={extract.error} />}
@@ -159,25 +160,25 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
           onChange={(e) => choose(e.target.files)}
         />
         {previewUrl ? (
-          <img src={previewUrl} alt="Selected recipe" className="max-h-72 rounded-xl object-contain" />
+          <img src={previewUrl} alt="התמונה שנבחרה" className="max-h-72 rounded-xl object-contain" />
         ) : (
           <span className="text-4xl" aria-hidden>📷</span>
         )}
         <span className="font-medium">
           {file ? file.name : (
             <>
-              <span className="pointer-coarse:hidden">Drop a photo here, or click to choose</span>
-              <span className="hidden pointer-coarse:inline">Tap to take or choose a photo</span>
+              <span className="pointer-coarse:hidden">גררו לכאן תמונה, או לחצו לבחירה</span>
+              <span className="hidden pointer-coarse:inline">הקישו כדי לצלם או לבחור תמונה</span>
             </>
           )}
         </span>
-        <span className="text-sm text-ink/50">JPEG, PNG or iPhone HEIC — a printed recipe works best</span>
+        <span className="text-sm text-ink/50">JPEG, PNG או HEIC מאייפון. מתכון מודפס עובד הכי טוב</span>
       </label>
 
       {extract.isPending ? (
         <Working
           // Estimated stages, based on backend timing (~8s reading the photo, then the typo check)
-          message={(seconds) => (seconds < 9 ? 'Reading the text from your photo…' : 'Double-checking for typos…')}
+          message={(seconds) => (seconds < 9 ? 'קוראים את הטקסט מהתמונה…' : 'בודקים שגיאות כתיב…')}
         />
       ) : (
         <button
@@ -185,7 +186,7 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
           onClick={() => file && extract.mutate(file, { onSuccess: onSaved })}
           className={primaryButtonClass}
         >
-          Extract recipe
+          חילוץ מתכון
         </button>
       )}
 
@@ -200,7 +201,7 @@ function Manual({ onSaved }: { onSaved: (r: Recipe) => void }) {
   const create = useCreateRecipe()
   return (
     <RecipeForm
-      submitLabel="Save recipe"
+      submitLabel="שמירת מתכון"
       isSubmitting={create.isPending}
       serverError={create.error}
       onSubmit={(input) => create.mutate(input, { onSuccess: onSaved })}
@@ -224,7 +225,7 @@ function Working({ message }: { message: (seconds: number) => string }) {
     <div role="status" className="flex items-center gap-3 rounded-xl bg-brand-50 px-4 py-3 text-brand-700">
       <span className="size-5 shrink-0 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
       <span className="flex-1">{message(seconds)}</span>
-      <span className="tabular-nums text-sm text-brand-700/70">{seconds}s</span>
+      <span className="tabular-nums text-sm text-brand-700/70">{seconds} שנ׳</span>
     </div>
   )
 }

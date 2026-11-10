@@ -2,7 +2,7 @@
 
 Save recipes from a **website link**, a **YouTube video** or a **photo of a cookbook page**.
 AI extracts the recipe, and you browse, search, edit and delete it in a React app.
-Hebrew recipes are supported, including right-to-left layout.
+The interface is in Hebrew with a full right-to-left layout (English recipes still display correctly).
 
 <!-- Add a screenshot or GIF here: ![Recipe Saver](docs/screenshot.png) -->
 

@@ -10,7 +10,7 @@ export default function Layout() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8 lg:px-12">
           <Link to="/" className="flex items-center gap-2.5 whitespace-nowrap text-lg font-bold">
             <span aria-hidden className="grid size-9 place-items-center rounded-xl bg-brand-600 text-xl shadow-sm">🍲</span>
-            Recipe Saver
+            שומר המתכונים
           </Link>
 
           <nav className="flex items-center gap-1 whitespace-nowrap text-sm font-medium">
@@ -22,13 +22,13 @@ export default function Layout() {
                 `hidden rounded-lg px-3 py-2 transition sm:block ${isActive ? 'bg-brand-50 text-brand-700' : 'text-ink/70 hover:bg-brand-50/60 hover:text-ink'}`
               }
             >
-              My recipes
+              המתכונים שלי
             </NavLink>
             <NavLink
               to="/add"
               className="rounded-lg bg-brand-600 px-4 py-2.5 text-white shadow-sm transition hover:bg-brand-hover hover:shadow"
             >
-              + Add recipe
+              + הוספת מתכון
             </NavLink>
             <ThemeToggle />
           </nav>
@@ -40,7 +40,7 @@ export default function Layout() {
       </main>
 
       <footer className="px-5 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom))] text-center text-sm text-ink/40">
-        Recipe Saver · links, videos and photos, saved as recipes
+        שומר המתכונים · קישורים, סרטונים ותמונות הופכים למתכונים
       </footer>
     </div>
   )

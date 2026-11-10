@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 // Small building blocks for the three states every data screen has: loading, error, empty.
 
-export function Spinner({ label = 'Loading…' }: { label?: string }) {
+export function Spinner({ label = 'טוען…' }: { label?: string }) {
   return (
     <div role="status" className="flex items-center justify-center gap-3 py-16 text-ink/60">
       <span className="size-5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
@@ -17,7 +17,7 @@ export function ErrorMessage({ error, onRetry }: { error: Error; onRetry?: () =>
       <p dir="auto">{error.message}</p>
       {onRetry && (
         <button onClick={onRetry} className="mt-2 text-sm font-medium underline">
-          Try again
+          נסו שוב
         </button>
       )}
     </div>

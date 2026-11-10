@@ -14,10 +14,10 @@ export default function EditRecipePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <h1 className="text-3xl font-bold">Edit recipe</h1>
+      <h1 className="text-3xl font-bold">עריכת מתכון</h1>
       <RecipeForm
         initialRecipe={recipe}
-        submitLabel="Save changes"
+        submitLabel="שמירת שינויים"
         isSubmitting={updateRecipe.isPending}
         serverError={updateRecipe.error}
         onSubmit={(input) => updateRecipe.mutate(input, { onSuccess: () => navigate(`/recipes/${id}`) })}

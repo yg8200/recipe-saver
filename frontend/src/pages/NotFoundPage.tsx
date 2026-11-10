@@ -3,10 +3,10 @@ import { EmptyState } from '../components/StatusViews'
 
 export default function NotFoundPage() {
   return (
-    <EmptyState title="Page not found">
-      This recipe or page doesn't exist.
+    <EmptyState title="הדף לא נמצא">
+      המתכון או הדף שחיפשתם לא קיימים.
       <div className="mt-4">
-        <Link to="/" className="font-medium text-brand-700 underline">Back to my recipes</Link>
+        <Link to="/" className="font-medium text-brand-700 underline">חזרה למתכונים שלי</Link>
       </div>
     </EmptyState>
   )

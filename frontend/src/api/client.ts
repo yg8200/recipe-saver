@@ -1,6 +1,8 @@
 // A thin wrapper around fetch() that every API call goes through.
 // It adds the /api prefix (see the proxy in vite.config.ts) and turns
-// the backend's {"error": "..."} responses into a typed ApiError.
+// the backend's {"error": "..."} responses into a typed ApiError with a Hebrew message.
+
+import { translateError } from './errors'
 
 export class ApiError extends Error {
   readonly status: number
@@ -18,7 +20,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
     response = await fetch(`/api${path}`, init)
   } catch {
     // fetch() only throws when the request never reached a server (backend down, no network)
-    throw new ApiError(0, 'Cannot reach the server. Is the backend running on port 5001?')
+    throw new ApiError(0, 'אין חיבור לשרת. בדקו שהשרת פועל ונסו שוב.')
   }
 
   // Our Flask API always answers in JSON; fall back to null if the body is empty or not JSON
@@ -26,7 +28,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
 
   if (!response.ok) {
     const message = body?.error ?? `Request failed with status ${response.status}`
-    throw new ApiError(response.status, message)
+    throw new ApiError(response.status, translateError(response.status, message))
   }
   return body as T
 }
