@@ -5,9 +5,9 @@ import ThemeToggle from './ThemeToggle'
 // <Outlet /> is where React Router renders the page that matches the URL.
 export default function Layout() {
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b border-brand-100 bg-cream/90 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+    <div className="min-h-dvh">
+      <header className="sticky top-0 z-10 border-b border-brand-100 bg-cream/90 pt-[env(safe-area-inset-top)] backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <Link to="/" className="flex items-center gap-2.5 whitespace-nowrap text-lg font-bold">
             <span aria-hidden className="grid size-9 place-items-center rounded-xl bg-brand-600 text-xl shadow-sm">🍲</span>
             Recipe Saver
@@ -26,7 +26,7 @@ export default function Layout() {
             </NavLink>
             <NavLink
               to="/add"
-              className="rounded-lg bg-brand-600 px-4 py-2 text-white shadow-sm transition hover:bg-brand-hover hover:shadow"
+              className="rounded-lg bg-brand-600 px-4 py-2.5 text-white shadow-sm transition hover:bg-brand-hover hover:shadow"
             >
               + Add recipe
             </NavLink>
@@ -35,11 +35,11 @@ export default function Layout() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
         <Outlet />
       </main>
 
-      <footer className="pb-8 text-center text-sm text-ink/40">
+      <footer className="px-4 pb-[calc(2rem+env(safe-area-inset-bottom))] text-center text-sm text-ink/40">
         Recipe Saver · links, videos and photos, saved as recipes
       </footer>
     </div>

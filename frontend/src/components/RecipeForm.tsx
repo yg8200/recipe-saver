@@ -83,11 +83,11 @@ export default function RecipeForm({ initialRecipe, submitLabel, isSubmitting, s
 
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Ingredients" hint="One per line">
-          <textarea dir="auto" rows={10} value={values.ingredients} onChange={update('ingredients')} className={inputClass}
+          <textarea dir="auto" rows={7} value={values.ingredients} onChange={update('ingredients')} className={inputClass}
             placeholder={'4 eggs\n4 ripe tomatoes\n1 tsp cumin'} />
         </Field>
         <Field label="Steps" hint="One per line">
-          <textarea dir="auto" rows={10} value={values.instructions} onChange={update('instructions')} className={inputClass}
+          <textarea dir="auto" rows={7} value={values.instructions} onChange={update('instructions')} className={inputClass}
             placeholder={'1. Sauté the peppers.\n2. Add tomatoes and simmer.'} />
         </Field>
       </div>
@@ -108,7 +108,7 @@ export default function RecipeForm({ initialRecipe, submitLabel, isSubmitting, s
         <p role="alert" dir="auto" className="rounded-lg bg-danger-bg px-4 py-3 text-sm text-danger">{errorMessage}</p>
       )}
 
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
           {isSubmitting ? 'Saving…' : submitLabel}
         </button>
@@ -134,8 +134,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 // Shared Tailwind class strings, exported so other pages style inputs/buttons the same way
 export const inputClass =
-  'w-full rounded-xl border border-brand-100 bg-surface px-3.5 py-2.5 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100'
+  'w-full rounded-xl border border-brand-100 bg-surface px-3.5 py-2.5 pointer-coarse:py-3 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100'
 export const primaryButtonClass =
-  'rounded-xl bg-brand-600 px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-60'
+  'rounded-xl bg-brand-600 px-5 py-2.5 pointer-coarse:py-3 font-medium text-white shadow-sm transition hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-60'
 export const secondaryButtonClass =
-  'rounded-xl border border-brand-100 bg-surface px-5 py-2.5 font-medium transition hover:bg-brand-50'
+  'rounded-xl border border-brand-100 bg-surface px-5 py-2.5 pointer-coarse:py-3 font-medium transition hover:bg-brand-50'

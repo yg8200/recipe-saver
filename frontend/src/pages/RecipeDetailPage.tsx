@@ -47,7 +47,7 @@ export default function RecipeDetailPage() {
           <button
             onClick={() => handleDelete(recipe.title)}
             disabled={deleteRecipe.isPending}
-            className="rounded-xl border border-danger-line bg-surface px-5 py-2.5 font-medium text-danger transition hover:bg-danger-bg disabled:opacity-60"
+            className="rounded-xl border border-danger-line bg-surface px-5 py-2.5 pointer-coarse:py-3 font-medium text-danger transition hover:bg-danger-bg disabled:opacity-60"
           >
             {deleteRecipe.isPending ? 'Deleting…' : 'Delete'}
           </button>

@@ -13,7 +13,7 @@ export default function ThemeToggle() {
       aria-checked={isDark}
       aria-label="Dark mode"
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="grid size-9 place-items-center rounded-lg text-lg transition hover:bg-brand-50"
+      className="grid size-9 place-items-center pointer-coarse:size-11 rounded-lg text-lg transition hover:bg-brand-50"
     >
       <span aria-hidden>{isDark ? '☀️' : '🌙'}</span>
     </button>

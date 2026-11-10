@@ -6,9 +6,9 @@ import RecipeForm, { inputClass, primaryButtonClass } from '../components/Recipe
 import { ErrorMessage } from '../components/StatusViews'
 
 const TABS = [
-  { id: 'link', label: '🔗 From a link' },
-  { id: 'photo', label: '📷 From a photo' },
-  { id: 'manual', label: '✍️ Type it in' },
+  { id: 'link', icon: '🔗', label: 'From a link' },
+  { id: 'photo', icon: '📷', label: 'From a photo' },
+  { id: 'manual', icon: '✍️', label: 'Type it in' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
 
@@ -34,16 +34,18 @@ export default function AddRecipePage() {
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setSearchParams({ tab: t.id }, { replace: true })}
-            className={`flex-1 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+            // Phone: icon above the label so each tab stays on one line. sm and up: side by side.
+            className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-sm font-medium transition sm:flex-row sm:justify-center sm:gap-2 sm:px-3 sm:py-2.5 ${
               tab === t.id ? 'bg-surface text-brand-700 shadow-sm' : 'text-ink/60 hover:text-ink'
             }`}
           >
-            {t.label}
+            <span aria-hidden>{t.icon}</span>
+            <span>{t.label}</span>
           </button>
         ))}
       </div>
 
-      <div className="rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
+      <div className="rounded-2xl border border-brand-100 bg-surface p-4 shadow-sm sm:p-6">
         {tab === 'link' && <FromLink onSaved={openRecipe} />}
         {tab === 'photo' && <FromPhoto onSaved={openRecipe} />}
         {tab === 'manual' && <Manual onSaved={openRecipe} />}
@@ -161,7 +163,14 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
         ) : (
           <span className="text-4xl" aria-hidden>📷</span>
         )}
-        <span className="font-medium">{file ? file.name : 'Drop a photo here, or click to choose'}</span>
+        <span className="font-medium">
+          {file ? file.name : (
+            <>
+              <span className="pointer-coarse:hidden">Drop a photo here, or click to choose</span>
+              <span className="hidden pointer-coarse:inline">Tap to take or choose a photo</span>
+            </>
+          )}
+        </span>
         <span className="text-sm text-ink/50">JPEG, PNG or iPhone HEIC — a printed recipe works best</span>
       </label>
 

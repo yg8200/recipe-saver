@@ -81,6 +81,16 @@ body {
   background-repeat: no-repeat;
 }
 
+/* A long unbroken word or URL wraps instead of pushing the page wider than the screen */
+main {
+  overflow-wrap: anywhere;
+}
+
+/* On notched phones (viewport-fit=cover) keep content clear of the notch and rounded corners */
+body {
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+}
+
 ::selection {
   background: var(--color-brand-200);
 }
