@@ -72,3 +72,21 @@ def test_broken_numbering_is_renumbered():
 def test_unnumbered_steps_are_untouched():
     steps = ["mix", "bake"]
     assert rc.normalize_step_numbering(steps) == steps
+
+
+
+# The AI is told to check the title, and a title it corrects is applied to the saved recipe.
+def test_correct_recipe_text_checks_and_fixes_the_title():
+    reply = MagicMock()
+    reply.choices[0].message.content = json.dumps(
+        {"corrections": [{"section": "title", "index": 0, "text": "פאי תפוחים"}]}
+    )
+    client = MagicMock()
+    client.chat.completions.create.return_value = reply
+    with patch.object(rc, "get_openai_client", return_value=client):
+        result = rc.correct_recipe_text(RECIPE)
+
+    messages = client.chat.completions.create.call_args.kwargs["messages"]
+    assert "title" in messages[0]["content"].lower() and "dish" in messages[0]["content"].lower()
+    assert json.loads(messages[1]["content"])["title"] == "באי תפוחים"  # the title is sent for checking
+    assert result["title"] == "פאי תפוחים"

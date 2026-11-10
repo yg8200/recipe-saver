@@ -26,6 +26,8 @@ def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
     4. ZERO HALLUCINATION: Do not add, guess, or invent any ingredients, instructions, or spices. If a word or number is not explicitly printed in the main text, it does not exist.
     5. NULL FIELDS: If prep_time, cook_time, or servings are not explicitly written as numbers, you MUST return null.
     6. ORIGINAL LANGUAGE: Keep all extracted text in Hebrew. Do not translate anything.
+    7. TITLE: The title is the name of the dish, usually the largest heading at the top of the recipe.
+       Do NOT use a website, magazine or author name, a section header, a slogan, a date or a page number.
 
     Return ONLY a valid JSON object matching this exact structure:
     {
