@@ -60,6 +60,13 @@ cd frontend && npm run build && npm run lint
 
 All AI calls are mocked in tests, so they need no API keys and cost nothing.
 
+To measure the photo-correction guardrail against real AI output (needs your keys, costs a few cents):
+
+```bash
+cd backend && PYTHONPATH=. .venv/bin/python evals/corrector_eval.py
+```
+When a photo goes wrong in real use, add that recipe to `backend/evals/corrector_cases.py` so it stays fixed.
+
 ## API
 
 | Method | Path | Purpose |
@@ -89,8 +96,14 @@ A Postman collection with every endpoint is in `backend/Recipe_Saver.postman_col
   `upgrade` works on a brand-new database and on one created earlier by `db.create_all()`.
 - **Two AI providers, each for what it does best.** Gemini reads the image and OpenAI edits text.
   Thinking is set to LOW for OCR, which cut photo extraction from about 29 s to about 12 s.
-- **The corrector returns only changed lines.** This saves output tokens, and a bad answer can never
-  delete or reorder content. Step numbering is fixed in code, not by the AI.
+- **The corrector is a proofreader, and its output is checked in code.** The model may only fix words the
+  OCR misread and returns just the lines it changed, each quoting the original line. A deterministic
+  gate (`review_correction`) then rejects any change that adds, removes or rewrites words, touches a
+  number or a section header, or points at the wrong line. Step numbering is fixed in code, not by the AI.
+- **The guardrail is measured, not guessed.** `backend/evals/` holds Hebrew recipes with known typos and
+  correct recipes that must stay untouched. On that set, `gpt-4o-mini` with the old prompt missed typos and
+  rewrote titles, and `gpt-4o` with the old prompt invented quantities. The current setup (`gpt-4o` plus the
+  gate) fixed 21/21 typos with no wrong or false edits.
 - **AI output is never trusted.** A deterministic validator checks every extraction before saving,
   and the photo route falls back to the raw OCR text if the corrector fails.
 - **One origin for the browser.** Vite in development and nginx in Docker both proxy `/api` to Flask,
