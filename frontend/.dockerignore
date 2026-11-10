@@ -1,0 +1,6 @@
+# Keep the build context small and the build reproducible: dependencies are installed
+# inside the image, and dist is rebuilt there.
+node_modules
+dist
+.DS_Store
+*.log
