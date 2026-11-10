@@ -10,6 +10,12 @@ import NotFoundPage from './NotFoundPage'
 // Section header lines look like "--- לשכבת השקדים ---"; strip the dashes for display
 const HEADER = /^-{2,}\s*(.*?)\s*-{2,}$/
 const headerText = (line: string) => line.match(HEADER)?.[1] ?? null
+// Photo recipes already carry their own "4." prefix. We draw our own number badge instead,
+// so strip the prefix to avoid showing the number twice.
+// Number of real steps up to and including index i (section headers don't count)
+const stepNumber = (lines: string[], i: number) =>
+  lines.slice(0, i + 1).filter((l) => headerText(l) === null).length
+const stripStepNumber = (line: string) => line.replace(/^\s*\d+\s*[.)]\s*/, '')
 
 export default function RecipeDetailPage() {
   const id = Number(useParams().id) // URL params are always strings
@@ -28,7 +34,7 @@ export default function RecipeDetailPage() {
 
   return (
     <article dir={textDirection(recipe.title)} className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-3xl border border-brand-100 bg-white p-6 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-8">
         <div className="space-y-3">
           <Link to="/" className="text-sm text-ink/60 hover:text-ink">
             <span className="inline-block rtl:rotate-180">←</span> All recipes
@@ -74,7 +80,12 @@ export default function RecipeDetailPage() {
               headerText(line) !== null ? (
                 <li key={i} className="pt-2 font-semibold text-brand-700">{headerText(line)}</li>
               ) : (
-                <li key={i}>{line}</li>
+                <li key={i} className="flex gap-3">
+                  <span aria-hidden className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
+                    {stepNumber(recipe.instructions, i)}
+                  </span>
+                  <span>{stripStepNumber(line)}</span>
+                </li>
               ),
             )}
           </ol>

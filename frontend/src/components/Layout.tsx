@@ -7,8 +7,8 @@ export default function Layout() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-brand-100 bg-cream/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-          <Link to="/" className="flex items-center gap-2 whitespace-nowrap text-lg font-bold">
-            <span aria-hidden className="text-2xl">🍲</span>
+          <Link to="/" className="flex items-center gap-2.5 whitespace-nowrap text-lg font-bold">
+            <span aria-hidden className="grid size-9 place-items-center rounded-xl bg-brand-600 text-xl shadow-sm">🍲</span>
             Recipe Saver
           </Link>
 
@@ -18,14 +18,14 @@ export default function Layout() {
               to="/"
               end
               className={({ isActive }) =>
-                `hidden rounded-lg px-3 py-2 transition sm:block ${isActive ? 'text-brand-700' : 'text-ink/70 hover:text-ink'}`
+                `hidden rounded-lg px-3 py-2 transition sm:block ${isActive ? 'bg-brand-50 text-brand-700' : 'text-ink/70 hover:bg-brand-50/60 hover:text-ink'}`
               }
             >
               My recipes
             </NavLink>
             <NavLink
               to="/add"
-              className="rounded-lg bg-brand-600 px-3 py-2 text-white shadow-sm transition hover:bg-brand-700"
+              className="rounded-lg bg-brand-600 px-4 py-2 text-white shadow-sm transition hover:bg-brand-700 hover:shadow"
             >
               + Add recipe
             </NavLink>
@@ -36,6 +36,10 @@ export default function Layout() {
       <main className="mx-auto max-w-5xl px-4 py-8">
         <Outlet />
       </main>
+
+      <footer className="pb-8 text-center text-sm text-ink/40">
+        Recipe Saver · links, videos and photos, saved as recipes
+      </footer>
     </div>
   )
 }

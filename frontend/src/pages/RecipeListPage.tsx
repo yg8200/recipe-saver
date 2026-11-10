@@ -27,10 +27,10 @@ export default function RecipeListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-br from-brand-600 to-brand-500 p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-8">
         <div>
-          <h1 className="text-3xl font-bold">My recipes</h1>
-          <p className="mt-1 text-ink/60">
+          <h1 className="text-3xl font-bold sm:text-4xl">My recipes</h1>
+          <p className="mt-1 text-white/80">
             {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'} saved
           </p>
         </div>
@@ -41,7 +41,8 @@ export default function RecipeListPage() {
             value={query}
             onChange={(e) => setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true })}
             placeholder="Search by title or ingredient…"
-            className={`${inputClass} sm:max-w-xs`}
+            aria-label="Search recipes"
+            className={`${inputClass} border-transparent text-ink sm:max-w-xs`}
           />
         )}
       </div>

@@ -21,5 +21,32 @@
 }
 
 body {
+  /* A soft warm glow at the top gives the page depth without adding noise */
   @apply bg-cream text-ink antialiased;
+  background-image: radial-gradient(60rem 28rem at 50% -8rem, var(--color-brand-100), transparent 70%);
+  background-repeat: no-repeat;
+}
+
+::selection {
+  background: var(--color-brand-200);
+}
+
+/* Visible keyboard focus on links and buttons (inputs already have their own ring) */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Pages fade in gently on navigation. Disabled for people who prefer reduced motion. */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+main > * {
+  animation: page-in 0.25s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  main > * { animation: none; }
 }
