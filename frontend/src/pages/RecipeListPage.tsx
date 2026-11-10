@@ -26,8 +26,8 @@ export default function RecipeListPage() {
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-br from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-8">
+    <div className="space-y-8">
+      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-br from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-10">
         <div>
           <h1 className="text-3xl font-bold sm:text-4xl">My recipes</h1>
           <p className="mt-1 text-white/90">
@@ -57,7 +57,7 @@ export default function RecipeListPage() {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matches">Nothing matches “{query}”.</EmptyState>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {filtered.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}

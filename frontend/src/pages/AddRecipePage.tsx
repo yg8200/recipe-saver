@@ -21,7 +21,7 @@ export default function AddRecipePage() {
   const openRecipe = (recipe: Recipe) => navigate(`/recipes/${recipe.id}`)
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Add a recipe</h1>
         <p className="mt-1 text-ink/60">Paste a link, snap a photo of a cookbook page, or type it yourself.</p>

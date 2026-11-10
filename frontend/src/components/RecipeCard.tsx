@@ -12,7 +12,7 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
     <Link
       to={`/recipes/${recipe.id}`}
       dir={textDirection(recipe.title)}
-      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-brand-100 bg-surface p-5 pt-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg hover:shadow-brand-200/40"
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-brand-100 bg-surface p-6 pt-7 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg hover:shadow-brand-200/40"
     >
       {/* Accent bar along the top edge; it grows on hover. */}
       <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 to-brand-200 transition-all duration-200 group-hover:h-1.5" />

@@ -33,7 +33,7 @@ export default function RecipeDetailPage() {
   }
 
   return (
-    <article dir={textDirection(recipe.title)} className="space-y-8">
+    <article dir={textDirection(recipe.title)} className="space-y-8 sm:space-y-10">
       <div className="flex flex-col gap-4 rounded-3xl border border-brand-100 bg-surface p-6 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-8">
         <div className="space-y-3">
           <Link to="/" className="text-sm text-ink/60 hover:text-ink">
@@ -56,7 +56,7 @@ export default function RecipeDetailPage() {
 
       {deleteRecipe.error && <ErrorMessage error={deleteRecipe.error} />}
 
-      <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
+      <div className="grid gap-6 sm:gap-8 md:grid-cols-[1fr_2fr]">
         <section className="h-fit rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold">Ingredients</h2>
           <ul className="space-y-2">

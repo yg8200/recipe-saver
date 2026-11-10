@@ -13,7 +13,7 @@ export default function EditRecipePage() {
   if (error) return <ErrorMessage error={error} />
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-8">
       <h1 className="text-3xl font-bold">Edit recipe</h1>
       <RecipeForm
         initialRecipe={recipe}
