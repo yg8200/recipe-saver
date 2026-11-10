@@ -11,6 +11,32 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    # Lets other services wait until Postgres actually accepts connections,
+    # not just until its container has started.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d recipe_saver"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  backend:
+    build: ./backend
+    container_name: recipe_saver_backend
+    restart: unless-stopped
+    # API keys and other settings come from backend/.env at runtime (never baked into the image)
+    env_file: ./backend/.env
+    environment:
+      # Inside Docker, "localhost" is the backend container itself. Services reach each other
+      # by service name, so the database host is "db". This overrides any DATABASE_URL in .env.
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/recipe_saver
+    ports:
+      - "5001:5001"
+    volumes:
+      # Mount the source code so edits on your Mac reload the server instantly (dev only)
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
 
   pgadmin:
     image: dpage/pgadmin4:latest

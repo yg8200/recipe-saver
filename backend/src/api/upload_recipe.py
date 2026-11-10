@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 from sqlalchemy import func
 from src.services.image_extractor import extract_recipe_from_image
 from src.services.recipe_corrector import correct_recipe_text
-from src.api.extract_recipe import validate_extracted_recipe  # ייבוא ה-Guardrail הדטרמיניסטי
+from src.api.extract_recipe import validate_extracted_recipe  # deterministic guardrail
 from src.core.database import db
 from src.models.recipe import Recipe
 
@@ -32,10 +32,10 @@ def upload_recipe_image():
         elif not mime_type:
             mime_type = 'image/jpeg'
 
-        # 1. חילוץ הטקסט מהתמונה (Gemini)
+        # 1. Read the text from the image (Gemini)
         raw_extracted_data = extract_recipe_from_image(image_bytes, mime_type)
 
-        # 2. Guardrail מבוסס AI: תיקון השגיאות של ה-OCR באנגלית דרך gpt-4o-mini
+        # 2. AI guardrail: fix OCR typos with the configured corrector model
         # If the corrector fails (API error, bad JSON, wrong shape), fall back to the raw OCR result
         # instead of failing the whole upload.
         try:
@@ -47,10 +47,10 @@ def upload_recipe_image():
             logger.warning("Recipe correction failed; saving uncorrected OCR text", exc_info=True)
             corrected_data = raw_extracted_data
 
-        # 3. Guardrail דטרמיניסטי: מוודא שהפלט תקין לפני ה-DB
+        # 3. Deterministic guardrail: make sure the output is valid before it reaches the DB
         validated_data = validate_extracted_recipe(corrected_data)
 
-        # בדיקה האם המתכון כבר קיים במסד הנתונים כדי למנוע כפילויות (אופציונלי אבל מומלץ)
+        # Reject duplicates (same title, case-insensitive)
         existing = (
             db.session.query(Recipe)
             .filter(func.lower(Recipe.title) == validated_data["title"].lower())
@@ -61,14 +61,14 @@ def upload_recipe_image():
                 "error": f"A recipe with the title '{validated_data['title']}' already exists."
             }), 409
 
-        # שמירה למסד הנתונים
+        # Save to the database
         new_recipe = Recipe(
-            title=validated_data.get("title", "Untitled Recipe"),
-            ingredients=validated_data.get("ingredients", []),
-            instructions=validated_data.get("instructions", []),
-            prep_time_minutes=validated_data.get("prep_time_minutes"),
-            cook_time_minutes=validated_data.get("cook_time_minutes"),
-            servings=validated_data.get("servings")
+            title=validated_data["title"],
+            ingredients=validated_data["ingredients"],
+            instructions=validated_data["instructions"],
+            prep_time_minutes=validated_data["prep_time_minutes"],
+            cook_time_minutes=validated_data["cook_time_minutes"],
+            servings=validated_data["servings"],
         )
         
         db.session.add(new_recipe)
@@ -77,7 +77,7 @@ def upload_recipe_image():
         return jsonify(new_recipe.to_dict()), 201
 
     except ValueError as ve:
-        # תופס שגיאות מה-Guardrail ומחזיר למשתמש
+        # Guardrail errors are the user's problem to see (400)
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         db.session.rollback()

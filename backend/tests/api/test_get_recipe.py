@@ -8,7 +8,7 @@ def test_get_all_recipes_empty(client):
     assert len(data) == 0
 
 
-# Listing recipes returns every saved recipe.
+# Listing recipes returns every saved recipe, oldest first.
 def test_get_all_recipes_with_data(client):
     client.post("/recipes", json={
         "title": "Salad",
@@ -28,6 +28,18 @@ def test_get_all_recipes_with_data(client):
     assert len(data) == 2
     assert data[0]["title"] == "Salad"
     assert data[1]["title"] == "Omelette"
+
+
+# Editing a recipe does not change its position in the list (order is by id, not by update time).
+def test_get_all_recipes_order_unchanged_after_update(client):
+    first = client.post("/recipes", json={"title": "First", "ingredients": ["a"], "instructions": ["b"]}).get_json()
+    client.post("/recipes", json={"title": "Second", "ingredients": ["a"], "instructions": ["b"]})
+    client.patch(f"/recipes/{first['id']}", json={"servings": 2})
+    client.post("/recipes", json={"title": "Third", "ingredients": ["a"], "instructions": ["b"]})
+
+    titles = [r["title"] for r in client.get("/recipes").get_json()]
+
+    assert titles == ["First", "Second", "Third"]
 
 
 # Fetching a recipe by id returns that recipe.

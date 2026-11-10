@@ -7,7 +7,9 @@ get_recipe_bp = Blueprint("get_recipe", __name__)
 
 @get_recipe_bp.route("/recipes", methods=["GET"])
 def get_all_recipes():
-    recipes = Recipe.query.all()
+    # Oldest first (by id), so the list reads in the order recipes were saved.
+    # Without an explicit ORDER BY, Postgres may return rows in any order.
+    recipes = Recipe.query.order_by(Recipe.id.asc()).all()
     return jsonify([recipe.to_dict() for recipe in recipes]), 200
 
 
