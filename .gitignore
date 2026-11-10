@@ -84,3 +84,7 @@ pgdata/
 
 # Local logs
 *.log
+# ==========================================
+# Local notes for Claude Code (not committed)
+# ==========================================
+CLAUDE.md
