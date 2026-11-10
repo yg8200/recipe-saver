@@ -4,6 +4,7 @@ import { useDeleteRecipe, useRecipe } from '../api/recipes'
 import { secondaryButtonClass } from '../components/RecipeForm'
 import RecipeMeta from '../components/RecipeMeta'
 import { ErrorMessage, Spinner } from '../components/StatusViews'
+import { imageSrc } from '../utils/imageUrl'
 import NotFoundPage from './NotFoundPage'
 
 // Section header lines look like "--- לשכבת השקדים ---"; strip the dashes for display
@@ -34,12 +35,21 @@ export default function RecipeDetailPage() {
   return (
     <article className="space-y-8 sm:space-y-10">
       <div className="flex flex-col gap-4 rounded-3xl border border-brand-100 bg-surface p-6 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-8">
-        <div className="space-y-3">
-          <Link to="/" className="text-sm text-ink/60 hover:text-ink">
-            <span className="inline-block rtl:rotate-180">←</span> כל המתכונים
-          </Link>
-          <h1 dir="auto" className="text-3xl font-bold leading-tight">{recipe.title}</h1>
-          <RecipeMeta recipe={recipe} />
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
+          {recipe.image_url && (
+            <img
+              src={imageSrc(recipe.image_url)!}
+              alt={recipe.title}
+              className="aspect-[4/3] w-full rounded-2xl object-cover shadow-sm sm:w-64 sm:shrink-0"
+            />
+          )}
+          <div className="space-y-3">
+            <Link to="/" className="text-sm text-ink/60 hover:text-ink">
+              <span className="inline-block rtl:rotate-180">←</span> כל המתכונים
+            </Link>
+            <h1 dir="auto" className="text-3xl font-bold leading-tight">{recipe.title}</h1>
+            <RecipeMeta recipe={recipe} />
+          </div>
         </div>
         <div className="flex shrink-0 gap-2">
           <Link to={`/recipes/${id}/edit`} className={secondaryButtonClass}>עריכה</Link>

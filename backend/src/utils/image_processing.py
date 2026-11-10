@@ -14,7 +14,7 @@ def process_and_compress_image(image_bytes: bytes, max_size: int = 1500) -> byte
     try:
         image = Image.open(io.BytesIO(image_bytes))
         image.load()
-    except (UnidentifiedImageError, OSError) as exc:
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
         raise ValueError("The uploaded file is not a valid or supported image.") from exc
 
     # Apply the EXIF orientation so phone photos are not sent sideways to the OCR model

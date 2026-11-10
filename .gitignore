@@ -82,6 +82,9 @@ pgdata/
 # JetBrains / PyCharm
 .idea/
 
+# Dish photos uploaded by users (runtime data, not source code)
+backend/uploads/
+
 # Local logs
 *.log
 # ==========================================

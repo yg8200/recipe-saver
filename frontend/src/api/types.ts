@@ -8,8 +8,9 @@ export interface Recipe {
   prep_time_minutes: number | null
   cook_time_minutes: number | null
   servings: number | null
+  image_url: string | null // path of the dish photo, e.g. "/images/ab12.jpg", or null
   created_at: string | null
 }
 
 // Body for creating/updating a recipe: everything except the server-generated fields.
-export type RecipeInput = Omit<Recipe, 'id' | 'created_at'>
+export type RecipeInput = Omit<Recipe, 'id' | 'created_at' | 'image_url'>

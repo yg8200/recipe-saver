@@ -4,6 +4,7 @@ import pytest
 
 from src.api.extract_recipe import validate_extracted_recipe
 from src.schemas.recipe_schema import RecipeExtracted
+from src.services.scraper import ScrapedPage
 from src.services.youtube_extractor import get_youtube_video_id, is_youtube_url
 
 
@@ -67,7 +68,7 @@ def test_is_youtube_url_does_not_match_lookalike_domains():
 # Extracting from a website URL scrapes the page, runs the AI extractor and saves the recipe (201).
 def test_extract_from_webpage_saves_recipe(client):
     model = RecipeExtracted(title="Web Cake", ingredients=["sugar"], instructions=["bake"], cook_time_minutes=30)
-    with patch("src.api.extract_recipe.scrape_recipe_page", return_value="page text"), \
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page text", None)), \
          patch("src.api.extract_recipe.extract_recipe_from_text", return_value=model):
         response = client.post("/recipes/extract", json={"url": "https://example.com/cake"})
     assert response.status_code == 201
@@ -80,7 +81,7 @@ def test_extract_from_webpage_saves_recipe(client):
 def test_extract_routes_youtube_urls(client):
     data = {"has_recipe": True, "title": "YT Salad", "ingredients": ["lettuce"], "instructions": ["toss"]}
     with patch("src.api.extract_recipe.extract_recipe_from_youtube", return_value=data) as yt, \
-         patch("src.api.extract_recipe.scrape_recipe_page") as scraper:
+         patch("src.api.extract_recipe.scrape_recipe") as scraper:
         response = client.post("/recipes/extract", json={"url": "https://youtu.be/abc"})
     assert response.status_code == 201
     yt.assert_called_once()
@@ -120,7 +121,7 @@ def test_validate_truncates_long_titles():
 
 # Whitespace around the URL is stripped before scraping.
 def test_extract_trims_url_before_scraping(client):
-    with patch("src.api.extract_recipe.scrape_recipe_page", return_value="page") as scraper, \
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page", None)) as scraper, \
          patch("src.api.extract_recipe.extract_recipe_from_text", return_value=WEB_RECIPE):
         response = client.post("/recipes/extract", json={"url": "  https://example.com/cake  "})
 
@@ -132,7 +133,7 @@ def test_extract_trims_url_before_scraping(client):
 def test_extract_duplicate_title_returns_409(client):
     client.post("/recipes", json={"title": "web cake", "ingredients": ["a"], "instructions": ["b"]})
 
-    with patch("src.api.extract_recipe.scrape_recipe_page", return_value="page"), \
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page", None)), \
          patch("src.api.extract_recipe.extract_recipe_from_text", return_value=WEB_RECIPE):
         response = client.post("/recipes/extract", json={"url": "https://example.com/cake"})
 
@@ -142,7 +143,7 @@ def test_extract_duplicate_title_returns_409(client):
 
 # A page that can't be fetched returns 400 with the scraper's error message.
 def test_extract_scraper_failure_returns_400(client):
-    with patch("src.api.extract_recipe.scrape_recipe_page",
+    with patch("src.api.extract_recipe.scrape_recipe",
                side_effect=ValueError("Failed to fetch recipe webpage: 404")):
         response = client.post("/recipes/extract", json={"url": "https://example.com/missing"})
 
@@ -181,7 +182,7 @@ def test_extract_invalid_youtube_link_returns_400_without_ai_call(client):
 
 # An unexpected AI/service error returns 500 with the error message.
 def test_extract_unexpected_error_returns_500(client):
-    with patch("src.api.extract_recipe.scrape_recipe_page", return_value="page"), \
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page", None)), \
          patch("src.api.extract_recipe.extract_recipe_from_text", side_effect=RuntimeError("OpenAI is down")):
         response = client.post("/recipes/extract", json={"url": "https://example.com/cake"})
 
@@ -192,8 +193,91 @@ def test_extract_unexpected_error_returns_500(client):
 # With no OPENAI_API_KEY configured, extraction returns 500 naming the missing key.
 def test_extract_missing_api_key_returns_500(client):
     # The autouse fixture blanks the keys, so the real extractor fails on configuration
-    with patch("src.api.extract_recipe.scrape_recipe_page", return_value="page"):
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page", None)):
         response = client.post("/recipes/extract", json={"url": "https://example.com/cake"})
 
     assert response.status_code == 500
     assert "OPENAI_API_KEY" in response.get_json()["error"]
+
+
+# ------------------------------------------------------------------ dish photo from the source
+
+def _uploaded(app):
+    import os
+    folder = app.config["UPLOAD_FOLDER"]
+    return os.listdir(folder) if os.path.isdir(folder) else []
+
+
+def _web_recipe(image_url):
+    model = RecipeExtracted(title="Pie", ingredients=["apples"], instructions=["bake"])
+    return (patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("text", image_url)),
+            patch("src.api.extract_recipe.extract_recipe_from_text", return_value=model))
+
+
+# When the page has an image, it is downloaded, stored and linked to the saved recipe.
+def test_extract_saves_the_page_image(client, app, jpeg_bytes, monkeypatch):
+    monkeypatch.setattr("src.services.recipe_image.download_image", lambda url: jpeg_bytes)
+    scrape, extract = _web_recipe("https://cdn.example.com/pie.jpg")
+    with scrape, extract:
+        response = client.post("/recipes/extract", json={"url": "https://example.com/pie"})
+
+    assert response.status_code == 201
+    image_url = response.get_json()["image_url"]
+    assert client.get(image_url).status_code == 200
+    assert len(_uploaded(app)) == 1
+
+
+# If the page has no image, or it can't be downloaded, the recipe is still saved (without a photo).
+@pytest.mark.parametrize("image_url", [None, "https://cdn.example.com/broken.jpg"])
+def test_extract_without_a_usable_image_still_saves_recipe(client, app, image_url):
+    scrape, extract = _web_recipe(image_url)
+    with scrape, extract:
+        response = client.post("/recipes/extract", json={"url": "https://example.com/pie"})
+
+    assert response.status_code == 201
+    assert response.get_json()["image_url"] is None
+    assert _uploaded(app) == []
+
+
+# For a YouTube link the thumbnail is used: the best size is tried first, then the smaller one.
+def test_extract_youtube_uses_thumbnail(client, jpeg_bytes, monkeypatch):
+    tried = []
+
+    def fake_download(url):
+        tried.append(url)
+        return jpeg_bytes if url.endswith("mqdefault.jpg") else None
+
+    monkeypatch.setattr("src.services.recipe_image.download_image", fake_download)
+    data = {"has_recipe": True, "title": "YT Salad", "ingredients": ["lettuce"], "instructions": ["toss"]}
+    with patch("src.api.extract_recipe.extract_recipe_from_youtube", return_value=data):
+        response = client.post("/recipes/extract", json={"url": "https://youtu.be/abc123"})
+
+    assert response.status_code == 201
+    assert response.get_json()["image_url"] is not None
+    assert [u.split("/")[-1] for u in tried] == ["maxresdefault.jpg", "mqdefault.jpg"]
+    assert "/vi/abc123/" in tried[0]
+
+
+# A duplicate recipe is rejected before any photo is downloaded.
+def test_extract_duplicate_does_not_download_image(client):
+    client.post("/recipes", json={"title": "Pie", "ingredients": ["a"], "instructions": ["b"]})
+    scrape, extract = _web_recipe("https://cdn.example.com/pie.jpg")
+    with scrape, extract, patch("src.api.extract_recipe.fetch_and_store_image") as fetch:
+        response = client.post("/recipes/extract", json={"url": "https://example.com/pie"})
+
+    assert response.status_code == 409
+    fetch.assert_not_called()
+
+
+# If saving the recipe fails after the photo was stored, the photo file is removed again.
+@pytest.mark.parametrize("error, status", [(RuntimeError("db down"), 500), (ValueError("bad row"), 400)])
+def test_extract_failure_after_image_cleans_up_file(client, app, jpeg_bytes, monkeypatch, error, status):
+    from src.core.database import db
+
+    monkeypatch.setattr("src.services.recipe_image.download_image", lambda url: jpeg_bytes)
+    scrape, extract = _web_recipe("https://cdn.example.com/pie.jpg")
+    with scrape, extract, patch.object(db.session, "commit", side_effect=error):
+        response = client.post("/recipes/extract", json={"url": "https://example.com/pie"})
+
+    assert response.status_code == status
+    assert _uploaded(app) == []

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from src.core.database import db
 from src.models.recipe import Recipe
+from src.services.image_store import delete_recipe_image
 
 delete_recipe_bp = Blueprint("delete_recipe", __name__)
 
@@ -12,8 +13,11 @@ def delete_recipe(recipe_id: int):
         return jsonify({"error": f"Recipe with id {recipe_id} not found"}), 404
 
     deleted_data = recipe.to_dict()
+    image_filename = recipe.image_filename
     db.session.delete(recipe)
     db.session.commit()
+    # Remove the photo file too, once the row is really gone
+    delete_recipe_image(image_filename)
 
     return jsonify({
         "message": "Recipe deleted successfully",

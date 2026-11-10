@@ -18,7 +18,7 @@ Every extraction passes a deterministic validator before it reaches the database
 
 ## Tech stack
 
-- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (106 tests, 92% coverage)
+- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (160 tests, 96% coverage), Alembic migrations
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query
 - **AI:** OpenAI (extraction and correction), Google Gemini (photo OCR)
 - **Infra:** Docker Compose (Postgres, backend, nginx-served frontend, pgAdmin)
@@ -69,14 +69,24 @@ All AI calls are mocked in tests, so they need no API keys and cost nothing.
 | POST | `/recipes` | Create a recipe manually |
 | PUT / PATCH | `/recipes/<id>` | Update a recipe |
 | DELETE | `/recipes/<id>` | Delete a recipe |
-| POST | `/recipes/extract` | Extract from `{"url": "..."}` (website or YouTube) |
+| POST | `/recipes/extract` | Extract from `{"url": "..."}` (website or YouTube). Also saves the page's main image or the video thumbnail as the dish photo |
 | POST | `/recipes/upload` | Extract from a photo (multipart field `image`) |
+| POST | `/recipes/<id>/image` | Add or replace the dish photo (multipart field `image`) |
+| DELETE | `/recipes/<id>/image` | Remove the dish photo |
+| GET | `/images/<file>` | Serve a stored photo |
 | GET | `/health` | Health check |
 
 A Postman collection with every endpoint is in `backend/Recipe_Saver.postman_collection.json`.
 
 ## Design decisions
 
+- **Dish photos come from page metadata, not from AI.** Recipe sites and YouTube already say which picture
+  represents the page (JSON-LD `image`, `og:image`, the video thumbnail). Reading that is free and instant
+  and can't invent a URL. Photos are downloaded, re-encoded as resized JPEGs and stored on disk
+  (`backend/uploads/`); the database keeps only the file name. Downloads refuse non-public addresses
+  (SSRF protection) and a missing photo never blocks saving the recipe.
+- **Schema changes go through Alembic** (`backend/migrations/`). The migrations are idempotent, so the same
+  `upgrade` works on a brand-new database and on one created earlier by `db.create_all()`.
 - **Two AI providers, each for what it does best.** Gemini reads the image and OpenAI edits text.
   Thinking is set to LOW for OCR, which cut photo extraction from about 29 s to about 12 s.
 - **The corrector returns only changed lines.** This saves output tokens, and a bad answer can never

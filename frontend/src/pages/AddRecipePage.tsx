@@ -1,7 +1,8 @@
 import { useEffect, useState, type DragEvent, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import { useCreateRecipe, useExtractFromImage, useExtractFromUrl } from '../api/recipes'
-import type { Recipe } from '../api/types'
+import { useCreateRecipe, useExtractFromImage, useExtractFromUrl, useUploadImage } from '../api/recipes'
+import ImageField from '../components/ImageField'
+import type { Recipe, RecipeInput } from '../api/types'
 import RecipeForm, { inputClass, primaryButtonClass } from '../components/RecipeForm'
 import { ErrorMessage } from '../components/StatusViews'
 
@@ -94,8 +95,8 @@ function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
       {url && (
         <p className="text-sm text-ink/60">
           {youtube
-            ? '▶️ סרטון יוטיוב: המתכון נקרא מתיאור הסרטון, והתמלול משלים את מה שחסר.'
-            : '🌐 אתר: הדף נקרא והמתכון מחולץ באמצעות בינה מלאכותית.'}
+            ? '▶️ סרטון יוטיוב: המתכון נקרא מתיאור הסרטון, והתמלול משלים את מה שחסר. תמונת הסרטון נשמרת כתמונת המנה.'
+            : '🌐 אתר: הדף נקרא והמתכון מחולץ באמצעות בינה מלאכותית. אם יש בדף תמונה של המנה, היא נשמרת גם.'}
         </p>
       )}
 
@@ -199,13 +200,40 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
 
 function Manual({ onSaved }: { onSaved: (r: Recipe) => void }) {
   const create = useCreateRecipe()
+  const uploadImage = useUploadImage()
+  const [photo, setPhoto] = useState<File | null>(null)
+
+  // Two requests: create the recipe, then attach the photo to it (the photo needs the new recipe's id).
+  async function save(input: RecipeInput) {
+    let recipe: Recipe
+    try {
+      recipe = await create.mutateAsync(input)
+    } catch {
+      return // the error is shown by the form through create.error
+    }
+    if (photo) {
+      try {
+        await uploadImage.mutateAsync({ id: recipe.id, file: photo })
+      } catch {
+        // The recipe is already saved; a failed photo shouldn't block it. It can be added from the edit page.
+      }
+    }
+    onSaved(recipe)
+  }
+
   return (
-    <RecipeForm
-      submitLabel="שמירת מתכון"
-      isSubmitting={create.isPending}
-      serverError={create.error}
-      onSubmit={(input) => create.mutate(input, { onSuccess: onSaved })}
-    />
+    <div className="space-y-5">
+      <section className="space-y-2">
+        <h2 className="text-sm font-medium">תמונה של המנה <span className="text-xs font-normal text-ink/50">אופציונלי</span></h2>
+        <ImageField onChoose={setPhoto} onRemove={photo ? () => setPhoto(null) : undefined} />
+      </section>
+      <RecipeForm
+        submitLabel="שמירת מתכון"
+        isSubmitting={create.isPending || uploadImage.isPending}
+        serverError={create.error}
+        onSubmit={save}
+      />
+    </div>
   )
 }
 

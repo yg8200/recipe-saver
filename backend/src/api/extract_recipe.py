@@ -5,9 +5,11 @@ from src.core.database import db
 from src.models.recipe import Recipe
 
 # Ensure these imports match your actual file names
-from src.services.scraper import scrape_recipe_page
+from src.services.scraper import scrape_recipe
+from src.services.image_store import delete_recipe_image
+from src.services.recipe_image import fetch_and_store_image, youtube_thumbnail_urls
 from src.services.ai_extractor import extract_recipe_from_text
-from src.services.youtube_extractor import extract_recipe_from_youtube, is_youtube_url
+from src.services.youtube_extractor import extract_recipe_from_youtube, get_youtube_video_id, is_youtube_url
 
 extract_recipe_bp = Blueprint("extract_recipe", __name__)
 
@@ -67,16 +69,19 @@ def extract_recipe():
         return jsonify({"error": "The 'url' field is required in the JSON body"}), 400
 
     url = url.strip()
+    image_filename = None  # set once a photo is stored; cleaned up again if saving the recipe fails
 
     try:
         # Route to the correct extraction service
         if is_youtube_url(url):
             # The YouTube extractor now handles description vs transcript logic internally
             raw_extracted = extract_recipe_from_youtube(url)
+            image_candidates = youtube_thumbnail_urls(get_youtube_video_id(url))
         else:
-            # Standard webpage scraping
-            raw_text = scrape_recipe_page(url)
-            raw_extracted = extract_recipe_from_text(raw_text)
+            # Standard webpage scraping: one fetch gives both the text and the page's main image
+            page = scrape_recipe(url)
+            raw_extracted = extract_recipe_from_text(page.text)
+            image_candidates = [page.image_url]
 
         # Apply the guardrail to ensure the AI actually found valid lists
         validated_data = validate_extracted_recipe(raw_extracted)
@@ -93,8 +98,12 @@ def extract_recipe():
                 "error": f"A recipe with the title '{validated_data['title']}' already exists (ID: {existing.id})."
             }), 409
 
+        # Best effort: a missing or broken photo never stops the recipe from being saved.
+        # Done after the duplicate check so we don't download a photo for a recipe we reject.
+        image_filename = fetch_and_store_image(image_candidates)
+
         # Save to database
-        new_recipe = Recipe(**validated_data)
+        new_recipe = Recipe(**validated_data, image_filename=image_filename)
 
         db.session.add(new_recipe)
         db.session.commit()
@@ -103,8 +112,10 @@ def extract_recipe():
 
     except ValueError as ve:
         db.session.rollback()
+        delete_recipe_image(image_filename)
         # Gracefully catches our "has_recipe is false" errors and missing transcripts
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         db.session.rollback()
+        delete_recipe_image(image_filename)
         return jsonify({"error": str(e)}), 500

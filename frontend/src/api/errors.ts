@@ -18,6 +18,7 @@ const TRANSLATIONS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/No instructions were found/, () => 'לא נמצאו הוראות הכנה במקור הזה.'],
   [/valid recipe title|did not return a valid JSON/, () => 'לא הצלחנו לזהות כאן מתכון.'],
   [/No image file provided|Empty file name/, () => 'לא נבחרה תמונה.'],
+  [/too large/, () => 'התמונה גדולה מדי (עד 16MB).'],
   [/not a valid or supported image/, () => 'הקובץ אינו תמונה תקינה. נסו JPEG, PNG או HEIC.'],
   [/Recipe with id \d+ not found/, () => 'המתכון לא נמצא.'],
   [/Request body must be a valid JSON/, () => 'הבקשה אינה תקינה.'],

@@ -1,8 +1,24 @@
+from dataclasses import dataclass
+
 from bs4 import BeautifulSoup
 from curl_cffi import requests
 
+from src.services.recipe_image import find_page_image_url
+
+
+@dataclass
+class ScrapedPage:
+    text: str
+    image_url: str | None  # the page's main picture, if it declares one
+
 
 def scrape_recipe_page(url: str) -> str:
+    """Just the readable text of the page."""
+    return scrape_recipe(url).text
+
+
+def scrape_recipe(url: str) -> ScrapedPage:
+    """Fetches the page once and returns both its readable text and its main image URL."""
     try:
         # Impersonate authentic Chrome TLS & HTTP/2 signatures
         response = requests.get(
@@ -21,6 +37,9 @@ def scrape_recipe_page(url: str) -> str:
 
     soup = BeautifulSoup(response.text, "html.parser")
 
+    # Look for the image BEFORE the cleanup below: it deletes the <script> tags that hold the JSON-LD
+    image_url = find_page_image_url(soup, str(getattr(response, "url", "") or url))
+
     # Strip script, style, navigation, ads, and structural elements
     for tag in soup(
         ["script", "style", "nav", "header", "footer", "aside", "form", "svg"]
@@ -33,4 +52,4 @@ def scrape_recipe_page(url: str) -> str:
     if not clean_text:
         raise ValueError("Could not extract readable text from the provided URL.")
 
-    return clean_text[:25000]
+    return ScrapedPage(text=clean_text[:25000], image_url=image_url)

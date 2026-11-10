@@ -271,6 +271,109 @@
               }
             }
           ]
+        },
+        {
+          "name": "Set Recipe Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/{{recipeId}}/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "{{recipeId}}",
+                "image"
+              ]
+            },
+            "description": "Add or replace the dish photo of recipe {{recipeId}}. In the Body tab, click 'Select Files' next to the `image` key and choose a JPEG, PNG or HEIC photo. The file is resized and stored; the response contains `image_url`.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "The dish photo"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 or 400 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove Recipe Image",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/{{recipeId}}/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "{{recipeId}}",
+                "image"
+              ]
+            },
+            "description": "Remove the dish photo of recipe {{recipeId}} (also deletes the file). Safe to call when the recipe has no photo."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Image File",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/images/<file name from image_url>",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "images",
+                "<file name from image_url>"
+              ]
+            },
+            "description": "Fetch a stored photo. Copy the file name from a recipe's `image_url` (for example `/images/ab12.jpg` -> `ab12.jpg`) and replace the last path segment."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -297,7 +400,7 @@
                 "extract"
               ]
             },
-            "description": "Scrape a recipe web page and extract it with OpenAI, then save it.",
+            "description": "Scrape a recipe web page and extract it with OpenAI, then save it.\n\nIf the page declares a main image (recipe JSON-LD or og:image) it is downloaded and saved as the dish photo (`image_url`).",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"url\": \"https://sallysbakingaddiction.com/easy-homemade-soft-pretzels/\"\n}",
@@ -345,7 +448,7 @@
                 "extract"
               ]
             },
-            "description": "Extract a recipe from a YouTube video (watch, youtu.be, shorts, embed and live links work). Uses the description first; the transcript is only used to fill in missing parts.\n\nReplace VIDEO_ID with a real cooking video before sending.",
+            "description": "Extract a recipe from a YouTube video (watch, youtu.be, shorts, embed and live links work). Uses the description first; the transcript is only used to fill in missing parts.\n\nReplace VIDEO_ID with a real cooking video before sending.\n\nThe video thumbnail is saved as the dish photo (`image_url`).",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=VIDEO_ID\"\n}",

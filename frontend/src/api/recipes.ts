@@ -18,6 +18,15 @@ export const recipesApi = {
 
   remove: (id: number) => apiRequest<{ message: string }>(`/recipes/${id}`, { method: 'DELETE' }),
 
+  // Dish photo: multipart upload like extractFromImage. Replaces any existing photo.
+  uploadImage: (id: number, file: File) => {
+    const form = new FormData()
+    form.append('image', file)
+    return apiRequest<Recipe>(`/recipes/${id}/image`, { method: 'POST', body: form })
+  },
+
+  removeImage: (id: number) => apiRequest<Recipe>(`/recipes/${id}/image`, { method: 'DELETE' }),
+
   // Website or YouTube link: the backend decides which extractor to use
   extractFromUrl: (url: string) =>
     apiRequest<Recipe>('/recipes/extract', { method: 'POST', ...jsonBody({ url }) }),
@@ -81,6 +90,22 @@ export function useUpdateRecipe(id: number) {
     },
   })
 }
+
+// Both photo actions return the updated recipe, so we put it straight into the cache.
+function usePhotoMutation<TVariables>(mutationFn: (vars: TVariables) => Promise<Recipe>) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn,
+    onSuccess: (recipe) => {
+      queryClient.setQueryData(recipeKeys.detail(recipe.id), recipe)
+      queryClient.invalidateQueries({ queryKey: recipeKeys.all, exact: true })
+    },
+  })
+}
+
+export const useUploadImage = () =>
+  usePhotoMutation(({ id, file }: { id: number; file: File }) => recipesApi.uploadImage(id, file))
+export const useRemoveImage = () => usePhotoMutation((id: number) => recipesApi.removeImage(id))
 
 export function useDeleteRecipe() {
   const queryClient = useQueryClient()

@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import type { Recipe } from '../api/types'
 import { textDirection } from '../utils/textDirection'
+import { imageSrc } from '../utils/imageUrl'
 import RecipeMeta from './RecipeMeta'
 
 // One recipe in the grid on the home page. The whole card is a link to the recipe page.
@@ -16,6 +17,15 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
     >
       {/* Accent bar along the top edge; it grows on hover. */}
       <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 to-brand-200 transition-all duration-200 group-hover:h-1.5" />
+      {recipe.image_url && (
+        // Negative margins cancel the card's padding so the photo runs edge to edge
+        <img
+          src={imageSrc(recipe.image_url)!}
+          alt=""
+          loading="lazy"
+          className="-mx-6 -mt-7 mb-1 aspect-[4/3] w-[calc(100%+3rem)] max-w-none object-cover"
+        />
+      )}
       {/* The card's dir (set from the title) mirrors the whole card for Hebrew recipes */}
       <h2 className="text-lg font-semibold leading-snug group-hover:text-brand-700">
         {recipe.title}
