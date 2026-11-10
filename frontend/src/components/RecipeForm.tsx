@@ -105,7 +105,7 @@ export default function RecipeForm({ initialRecipe, submitLabel, isSubmitting, s
       </div>
 
       {errorMessage && (
-        <p role="alert" dir="auto" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">{errorMessage}</p>
+        <p role="alert" dir="auto" className="rounded-lg bg-danger-bg px-4 py-3 text-sm text-danger">{errorMessage}</p>
       )}
 
       <div className="flex gap-3">
@@ -134,8 +134,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 // Shared Tailwind class strings, exported so other pages style inputs/buttons the same way
 export const inputClass =
-  'w-full rounded-xl border border-brand-100 bg-white px-3.5 py-2.5 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100'
+  'w-full rounded-xl border border-brand-100 bg-surface px-3.5 py-2.5 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100'
 export const primaryButtonClass =
-  'rounded-xl bg-brand-600 px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60'
+  'rounded-xl bg-brand-600 px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-60'
 export const secondaryButtonClass =
-  'rounded-xl border border-brand-100 bg-white px-5 py-2.5 font-medium transition hover:bg-brand-50'
+  'rounded-xl border border-brand-100 bg-surface px-5 py-2.5 font-medium transition hover:bg-brand-50'

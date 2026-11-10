@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router'
+import ThemeToggle from './ThemeToggle'
 
 // The frame shared by every page: header + the current page's content.
 // <Outlet /> is where React Router renders the page that matches the URL.
@@ -25,10 +26,11 @@ export default function Layout() {
             </NavLink>
             <NavLink
               to="/add"
-              className="rounded-lg bg-brand-600 px-4 py-2 text-white shadow-sm transition hover:bg-brand-700 hover:shadow"
+              className="rounded-lg bg-brand-600 px-4 py-2 text-white shadow-sm transition hover:bg-brand-hover hover:shadow"
             >
               + Add recipe
             </NavLink>
+            <ThemeToggle />
           </nav>
         </div>
       </header>

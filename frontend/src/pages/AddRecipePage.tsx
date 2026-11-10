@@ -35,7 +35,7 @@ export default function AddRecipePage() {
             aria-selected={tab === t.id}
             onClick={() => setSearchParams({ tab: t.id }, { replace: true })}
             className={`flex-1 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-              tab === t.id ? 'bg-white text-brand-700 shadow-sm' : 'text-ink/60 hover:text-ink'
+              tab === t.id ? 'bg-surface text-brand-700 shadow-sm' : 'text-ink/60 hover:text-ink'
             }`}
           >
             {t.label}
@@ -43,7 +43,7 @@ export default function AddRecipePage() {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
         {tab === 'link' && <FromLink onSaved={openRecipe} />}
         {tab === 'photo' && <FromPhoto onSaved={openRecipe} />}
         {tab === 'manual' && <Manual onSaved={openRecipe} />}

@@ -34,7 +34,7 @@ export default function RecipeDetailPage() {
 
   return (
     <article dir={textDirection(recipe.title)} className="space-y-8">
-      <div className="flex flex-col gap-4 rounded-3xl border border-brand-100 bg-white p-6 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-8">
+      <div className="flex flex-col gap-4 rounded-3xl border border-brand-100 bg-surface p-6 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-8">
         <div className="space-y-3">
           <Link to="/" className="text-sm text-ink/60 hover:text-ink">
             <span className="inline-block rtl:rotate-180">←</span> All recipes
@@ -47,7 +47,7 @@ export default function RecipeDetailPage() {
           <button
             onClick={() => handleDelete(recipe.title)}
             disabled={deleteRecipe.isPending}
-            className="rounded-xl border border-red-200 bg-white px-5 py-2.5 font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60"
+            className="rounded-xl border border-danger-line bg-surface px-5 py-2.5 font-medium text-danger transition hover:bg-danger-bg disabled:opacity-60"
           >
             {deleteRecipe.isPending ? 'Deleting…' : 'Delete'}
           </button>
@@ -57,15 +57,15 @@ export default function RecipeDetailPage() {
       {deleteRecipe.error && <ErrorMessage error={deleteRecipe.error} />}
 
       <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
-        <section className="h-fit rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
+        <section className="h-fit rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold">Ingredients</h2>
           <ul className="space-y-2">
             {recipe.ingredients.map((line, i) =>
               headerText(line) !== null ? (
-                <li key={i} className="pt-2 text-sm font-semibold text-brand-700">{headerText(line)}</li>
+                <li key={i} className="pt-2 text-sm font-semibold text-herb-700">{headerText(line)}</li>
               ) : (
                 <li key={i} className="flex gap-2">
-                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-500" />
+                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-herb-500" />
                   {line}
                 </li>
               ),
@@ -73,7 +73,7 @@ export default function RecipeDetailPage() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold">Steps</h2>
           <ol className="space-y-4 leading-relaxed">
             {recipe.instructions.map((line, i) =>

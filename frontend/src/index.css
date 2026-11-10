@@ -7,18 +7,72 @@
 @theme {
   --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
 
-  /* Warm tomato/paprika brand color */
-  --color-brand-50: #fff4ed;
-  --color-brand-100: #ffe6d4;
-  --color-brand-200: #ffc9a8;
-  --color-brand-500: #f0642e;
-  --color-brand-600: #dc4a17;
-  --color-brand-700: #b53813;
+  /* Warm tomato/coral brand color. Used for actions, links and highlights. */
+  --color-brand-50: #fff3ec;
+  --color-brand-100: #ffe3d1;
+  --color-brand-200: #ffc7a3;
+  --color-brand-500: #ee6a35;
+  --color-brand-600: #cf4a17;
+  --color-brand-700: #a8380f;
+  --color-brand-hover: #b53d10; /* hover color for solid brand buttons */
 
-  /* Warm neutral for backgrounds and text */
-  --color-cream: #fbf8f4;
-  --color-ink: #2b2420;
+  /* Fresh herb green as a friendly second accent (ingredients, time/servings badges) */
+  --color-herb-50: #f0f7ee;
+  --color-herb-100: #dcecd8;
+  --color-herb-500: #5a9a5f;
+  --color-herb-700: #2f6139;
+
+  /* Page, card and text colors */
+  --color-cream: #fff9f3;
+  --color-surface: #ffffff;
+  --color-ink: #3a2d27;
+
+  /* Errors and destructive actions */
+  --color-danger: #b42318;
+  --color-danger-bg: #fef3f2;
+  --color-danger-line: #fecdca;
+
+  /* Header banner on the home page */
+  --color-hero-from: #c2410c;
+  --color-hero-to: #ea580c;
 }
+
+/*
+  Dark mode. Every color above is a CSS variable, so switching themes just means
+  redefining the same variables under .dark (set on <html> by the theme toggle).
+  No component needs a separate dark: class. Dark surfaces are warm browns, not pure
+  black, and the brand-700 text color becomes a light peach so it stays readable.
+*/
+.dark {
+  color-scheme: dark;
+
+  --color-brand-50: #2e1d15;
+  --color-brand-100: #43281b;
+  --color-brand-200: #7a4228;
+  --color-brand-500: #ff8f63;
+  --color-brand-600: #d9531f;
+  --color-brand-700: #ffb08a;
+  --color-brand-hover: #e8622d;
+
+  --color-herb-50: #17261a;
+  --color-herb-100: #223a27;
+  --color-herb-500: #6fbf7b;
+  --color-herb-700: #9bd8a4;
+
+  --color-cream: #181311;
+  --color-surface: #231c18;
+  --color-ink: #f5ede7;
+
+  --color-danger: #ffb4ab;
+  --color-danger-bg: #3a1717;
+  --color-danger-line: #7a2b2b;
+
+  --color-hero-from: #a63a14;
+  --color-hero-to: #d9531f;
+}
+
+/* Lets Tailwind's dark: variant work too, driven by the same .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
 
 body {
   /* A soft warm glow at the top gives the page depth without adding noise */

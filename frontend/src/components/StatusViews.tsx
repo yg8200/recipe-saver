@@ -13,7 +13,7 @@ export function Spinner({ label = 'Loading…' }: { label?: string }) {
 
 export function ErrorMessage({ error, onRetry }: { error: Error; onRetry?: () => void }) {
   return (
-    <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
+    <div role="alert" className="rounded-xl border border-danger-line bg-danger-bg p-4 text-danger">
       <p dir="auto">{error.message}</p>
       {onRetry && (
         <button onClick={onRetry} className="mt-2 text-sm font-medium underline">

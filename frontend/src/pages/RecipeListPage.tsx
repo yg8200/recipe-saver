@@ -27,11 +27,11 @@ export default function RecipeListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-br from-brand-600 to-brand-500 p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-8">
+      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-br from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-8">
         <div>
           <h1 className="text-3xl font-bold sm:text-4xl">My recipes</h1>
-          <p className="mt-1 text-white/80">
-            {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'} saved
+          <p className="mt-1 text-white/90">
+            {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'} saved · what are we cooking today?
           </p>
         </div>
         {recipes.length > 0 && (
@@ -48,8 +48,8 @@ export default function RecipeListPage() {
       </div>
 
       {recipes.length === 0 ? (
-        <EmptyState title="No recipes yet">
-          Save your first one from a website, a YouTube video or a photo.
+        <EmptyState title="Your cookbook is empty, for now">
+          Save your first recipe from a website, a YouTube video or a photo of grandma's handwriting.
           <div className="mt-4">
             <Link to="/add" className="font-medium text-brand-700 underline">Add a recipe</Link>
           </div>
