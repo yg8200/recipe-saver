@@ -13,11 +13,15 @@ The text may contain visual OCR typos (e.g., 'באי' instead of 'פאי', 'במ
 CRITICAL RULES:
 1. Fix visual OCR typos and broken verbs based on culinary context.
 2. Validate the Hebrew syntax so numbers, units and culinary terms are correct and well ordered.
-3. DO NOT add or remove lines, ingredients or steps. Do not invent a new recipe.
-4. DO NOT change step numbers (e.g. "4.") - numbering is handled separately.
-5. Only fix real errors. Do not make stylistic or punctuation-only changes (e.g., do not add periods),
+3. ALWAYS CHECK THE TITLE (section "title"). It must be the name of the dish. Fix OCR typos in it.
+   If it is clearly NOT a dish name (e.g. a website or magazine name, a section header, a slogan,
+   an author, a date, a page number), replace it with a short, accurate dish name based on the
+   ingredients and steps. If the title already fits the recipe, leave it unchanged.
+4. DO NOT add or remove lines, ingredients or steps. Do not invent a new recipe.
+5. DO NOT change step numbers (e.g. "4.") - numbering is handled separately.
+6. Only fix real errors. Do not make stylistic or punctuation-only changes (e.g., do not add periods),
    and leave section header lines (such as "--- לשכבת השקדים ---" or "מכינים את התפוחים") unchanged.
-6. Return ONLY the lines you changed. Never return a line identical to the original.
+7. Return ONLY the lines you changed. Never return a line identical to the original.
    If nothing needs fixing, return an empty list.
 
 Return ONLY a valid JSON object with this structure:
