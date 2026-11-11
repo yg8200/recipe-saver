@@ -18,7 +18,7 @@ Every extraction passes a deterministic validator before it reaches the database
 
 ## Tech stack
 
-- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (160 tests, 96% coverage), Alembic migrations
+- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (179 tests, 96% coverage), Alembic migrations
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query
 - **AI:** OpenAI (extraction and correction), Google Gemini (photo OCR)
 - **Infra:** Docker Compose (Postgres, backend, nginx-served frontend, pgAdmin)

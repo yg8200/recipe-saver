@@ -77,6 +77,22 @@ def test_extract_from_webpage_saves_recipe(client):
     assert body["cook_time_minutes"] == 30
 
 
+# Group heading lines ("--- name ---") from the AI stay in place in the saved ingredients and steps.
+def test_extract_keeps_group_heading_lines(client):
+    model = RecipeExtracted(
+        title="Grouped Pie",
+        ingredients=["--- Dough ---", "2 cups flour", "--- Topping ---", "1 cup sugar"],
+        instructions=["--- Dough ---", "mix", "--- Topping ---", "sprinkle"],
+    )
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page text", None)), \
+         patch("src.api.extract_recipe.extract_recipe_from_text", return_value=model):
+        response = client.post("/recipes/extract", json={"url": "https://example.com/pie"})
+    assert response.status_code == 201
+    body = response.get_json()
+    assert body["ingredients"] == ["--- Dough ---", "2 cups flour", "--- Topping ---", "1 cup sugar"]
+    assert body["instructions"][0] == "--- Dough ---"
+
+
 # YouTube URLs go to the YouTube extractor, not the website scraper.
 def test_extract_routes_youtube_urls(client):
     data = {"has_recipe": True, "title": "YT Salad", "ingredients": ["lettuce"], "instructions": ["toss"]}
