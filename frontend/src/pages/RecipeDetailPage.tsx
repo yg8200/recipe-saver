@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/client'
 import { useDeleteRecipe, useRecipe } from '../api/recipes'
+import FolderPicker from '../components/FolderPicker'
 import { secondaryButtonClass } from '../components/RecipeForm'
 import RecipeMeta from '../components/RecipeMeta'
 import { ErrorMessage, Spinner } from '../components/StatusViews'
@@ -64,6 +65,8 @@ export default function RecipeDetailPage() {
       </div>
 
       {deleteRecipe.error && <ErrorMessage error={deleteRecipe.error} />}
+
+      <FolderPicker recipe={recipe} />
 
       <div className="grid gap-6 sm:gap-8 md:grid-cols-[1fr_2fr]">
         <section className="h-fit rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">

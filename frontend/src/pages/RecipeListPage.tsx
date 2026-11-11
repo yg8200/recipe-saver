@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { useRecipes } from '../api/recipes'
+import FolderGrid from '../components/FolderGrid'
 import RecipeCard from '../components/RecipeCard'
 import { inputClass } from '../components/RecipeForm'
 import { EmptyState, ErrorMessage, Spinner } from '../components/StatusViews'
@@ -12,7 +13,6 @@ export default function RecipeListPage() {
   // so a search survives a page refresh and can be shared as a link.
   const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q') ?? ''
-
   // useMemo: only re-filter when the recipes or the query change, not on every render
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -47,6 +47,8 @@ export default function RecipeListPage() {
         )}
       </div>
 
+      {recipes.length > 0 && <FolderGrid />}
+
       {recipes.length === 0 ? (
         <EmptyState title="ספר המתכונים שלך עדיין ריק">
           שמרו את המתכון הראשון מאתר, מסרטון יוטיוב או מצילום של המתכון של סבתא.
@@ -57,11 +59,14 @@ export default function RecipeListPage() {
       ) : filtered.length === 0 ? (
         <EmptyState title="לא נמצאו תוצאות">אין מתכון שמתאים ל־“{query}”.</EmptyState>
       ) : (
-        <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {filtered.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
+        <section className="space-y-4" aria-labelledby="recipes-heading">
+          <h2 id="recipes-heading" className="text-xl font-semibold">כל המתכונים</h2>
+          <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            {filtered.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            ))}
+          </div>
+        </section>
       )}
     </div>
   )

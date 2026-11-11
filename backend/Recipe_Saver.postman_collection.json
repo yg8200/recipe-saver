@@ -2,7 +2,7 @@
   "info": {
     "name": "Recipe Saver API",
     "_postman_id": "7d9e4a3b-18f2-491c-b3a1-7c5f891b9201",
-    "description": "All endpoints of the local Recipe Saver backend.\n\n- `baseUrl` defaults to http://127.0.0.1:5001 (change it under the collection's Variables tab).\n- Every request that creates a recipe (manual, URL, YouTube, image) saves the new id into `recipeId`, so Get / Update / Delete act on the last recipe you created.\n- Titles are unique: creating the same recipe twice returns 409. Delete it first or change the title.",
+    "description": "All endpoints of the local Recipe Saver backend.\n\n- `baseUrl` defaults to http://127.0.0.1:5001 (change it under the collection's Variables tab).\n- Every request that creates a recipe (manual, URL, YouTube, image) saves the new id into `recipeId`, so Get / Update / Delete act on the last recipe you created.\n- Titles are unique: creating the same recipe twice returns 409. Delete it first or change the title.\n- The Folders group saves the id of the folder you create into `folderId`.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -12,6 +12,10 @@
     },
     {
       "key": "recipeId",
+      "value": "1"
+    },
+    {
+      "key": "folderId",
       "value": "1"
     }
   ],
@@ -370,6 +374,222 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status is 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Folders",
+      "item": [
+        {
+          "name": "Create Folder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/folders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "folders"
+              ]
+            },
+            "description": "Create a folder. The new id is saved into `folderId`. Names are unique, ignoring letter case (409 if taken).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"המנות של סבתא\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "pm.collectionVariables.set('folderId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Folders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/folders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "folders"
+              ]
+            },
+            "description": "List folders (sorted by name) with how many recipes each holds."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rename Folder",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/folders/{{folderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "folders",
+                "{{folderId}}"
+              ]
+            },
+            "description": "Rename the folder saved in `folderId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grandma's dishes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Recipe to Folder",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/folders/{{folderId}}/recipes/{{recipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "folders",
+                "{{folderId}}",
+                "recipes",
+                "{{recipeId}}"
+              ]
+            },
+            "description": "Put the recipe in the folder. Idempotent: adding twice is fine. A recipe can be in several folders. Returns the recipe with its `folder_ids`."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove Recipe from Folder",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/folders/{{folderId}}/recipes/{{recipeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "folders",
+                "{{folderId}}",
+                "recipes",
+                "{{recipeId}}"
+              ]
+            },
+            "description": "Take the recipe out of the folder. The recipe itself is kept."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Folder",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/folders/{{folderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "folders",
+                "{{folderId}}"
+              ]
+            },
+            "description": "Delete the folder. Its recipes are NOT deleted, they just leave the folder."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
                 ]
               }
             }
