@@ -8,29 +8,29 @@
   --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
 
   /* Warm tomato/coral brand color. Used for actions, links and highlights. */
-  --color-brand-50: #fbe9d9;
-  --color-brand-100: #f0d5bc;
-  --color-brand-200: #e9b48c;
+  --color-brand-50: #efd9bf;
+  --color-brand-100: #dcc3a3;
+  --color-brand-200: #d9a47a;
   --color-brand-500: #ee6a35;
   --color-brand-600: #cf4a17;
   --color-brand-700: #a8380f;
   --color-brand-hover: #b53d10; /* hover color for solid brand buttons */
 
   /* Fresh herb green as a friendly second accent (ingredients, time/servings badges) */
-  --color-herb-50: #e6efdb;
-  --color-herb-100: #d1e3c4;
+  --color-herb-50: #d6e3c6;
+  --color-herb-100: #c2d6b0;
   --color-herb-500: #5a9a5f;
   --color-herb-700: #2f6139;
 
-  /* Page, card and text colors */
-  --color-cream: #f5ebdd;
-  --color-surface: #fffaf2;
-  --color-ink: #3a2d27;
+  /* Page, card and text colors. The light theme is deliberately soft (no near-white surfaces) to be easy on the eyes. */
+  --color-cream: #e6d9c3;
+  --color-surface: #f1e6d2;
+  --color-ink: #2f241e;
 
   /* Errors and destructive actions */
   --color-danger: #b42318;
-  --color-danger-bg: #fbe6df;
-  --color-danger-line: #f0b9ae;
+  --color-danger-bg: #efd0c4;
+  --color-danger-line: #deab9d;
 
   /* Header banner on the home page */
   --color-hero-from: #c2410c;
