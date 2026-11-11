@@ -2,7 +2,8 @@
 
 Save recipes from a **website link**, a **YouTube video** or a **photo of a cookbook page**.
 AI extracts the recipe, and you browse, search, edit and delete it in a React app. Recipes can be
-organised into folders (a recipe can be in several), including by dragging a recipe onto a folder.
+organised into folders (a recipe can be in several), including by dragging a recipe onto a folder,
+and rated with 1 to 5 stars.
 The interface is in Hebrew with a full right-to-left layout (English recipes still display correctly).
 
 <!-- Add a screenshot or GIF here: ![Recipe Saver](docs/screenshot.png) -->
@@ -19,7 +20,7 @@ Every extraction passes a deterministic validator before it reaches the database
 
 ## Tech stack
 
-- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (195 tests, 96% coverage), Alembic migrations
+- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (211 tests, 96% coverage), Alembic migrations
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query
 - **AI:** OpenAI (extraction and correction), Google Gemini (photo OCR)
 - **Infra:** Docker Compose (Postgres, backend, nginx-served frontend, pgAdmin)
@@ -75,7 +76,7 @@ When a photo goes wrong in real use, add that recipe to `backend/evals/corrector
 | GET | `/recipes` | List recipes (oldest first) |
 | GET | `/recipes/<id>` | Get one recipe |
 | POST | `/recipes` | Create a recipe manually |
-| PUT / PATCH | `/recipes/<id>` | Update a recipe |
+| PUT / PATCH | `/recipes/<id>` | Update a recipe (also sets the 1-5 star `rating`; `null` clears it) |
 | DELETE | `/recipes/<id>` | Delete a recipe |
 | POST | `/recipes/extract` | Extract from `{"url": "..."}` (website or YouTube). Also saves the page's main image or the video thumbnail as the dish photo |
 | POST | `/recipes/upload` | Extract from a photo (multipart field `image`) |

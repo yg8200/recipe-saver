@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiRequest, jsonBody } from './client'
-import type { Recipe, RecipeInput } from './types'
+import type { Recipe, RecipeInput, RecipeUpdate } from './types'
 
 // ---------------------------------------------------------------------------
 // Plain API functions: one per backend endpoint. They know nothing about React.
@@ -13,7 +13,7 @@ export const recipesApi = {
 
   create: (input: RecipeInput) => apiRequest<Recipe>('/recipes', { method: 'POST', ...jsonBody(input) }),
 
-  update: (id: number, input: Partial<RecipeInput>) =>
+  update: (id: number, input: RecipeUpdate) =>
     apiRequest<Recipe>(`/recipes/${id}`, { method: 'PATCH', ...jsonBody(input) }),
 
   remove: (id: number) => apiRequest<{ message: string }>(`/recipes/${id}`, { method: 'DELETE' }),
@@ -83,7 +83,7 @@ export const useExtractFromImage = () => useCreateMutation(recipesApi.extractFro
 export function useUpdateRecipe(id: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: Partial<RecipeInput>) => recipesApi.update(id, input),
+    mutationFn: (input: RecipeUpdate) => recipesApi.update(id, input),
     onSuccess: (recipe) => {
       queryClient.setQueryData(recipeKeys.detail(id), recipe)
       queryClient.invalidateQueries({ queryKey: recipeKeys.all, exact: true })

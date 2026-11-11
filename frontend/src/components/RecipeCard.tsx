@@ -4,6 +4,7 @@ import { textDirection } from '../utils/textDirection'
 import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
 import { imageSrc } from '../utils/imageUrl'
 import RecipeMeta from './RecipeMeta'
+import StarRating from './StarRating'
 
 // One recipe in the grid on the home page. The whole card is a link to the recipe page.
 export default function RecipeCard({ recipe }: { recipe: Recipe }) {
@@ -38,6 +39,8 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
       <h2 className="text-lg font-semibold leading-snug group-hover:text-brand-700">
         {recipe.title}
       </h2>
+
+      {recipe.rating !== null && <StarRating value={recipe.rating} />}
 
       <ul dir="auto" className="space-y-0.5 text-sm text-ink/60">
         {preview.map((line, i) => (

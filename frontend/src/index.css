@@ -27,6 +27,9 @@
   --color-surface: #f1e6d2;
   --color-ink: #2f241e;
 
+  /* Rating stars */
+  --color-star: #d08a00;
+
   /* Errors and destructive actions */
   --color-danger: #b42318;
   --color-danger-bg: #efd0c4;
@@ -62,6 +65,7 @@
   --color-cream: #181311;
   --color-surface: #231c18;
   --color-ink: #f5ede7;
+  --color-star: #f5b942;
 
   --color-danger: #ffb4ab;
   --color-danger-bg: #3a1717;
