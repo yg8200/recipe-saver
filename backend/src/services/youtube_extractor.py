@@ -54,12 +54,14 @@ CRITICAL RULES:
 2. LANGUAGE: Output in the EXACT SAME LANGUAGE as the source text. Do not translate.
 3. AMOUNTS: If exact amounts are missing, write ingredients as spoken/written.
 4. MISSING DATA: If prep_time, cook_time (in minutes) or servings are not mentioned, return null.
-5. NOT A RECIPE: If the text contains neither ingredients nor instructions, return empty lists and a null title.
+5. GROUPS: If ingredients or steps are split into named parts (e.g. "For the dough", "For the topping"),
+   add a line "--- group name ---" before each group. If there are no groups, add no such lines. Never invent group names.
+6. NOT A RECIPE: If the text contains neither ingredients nor instructions, return empty lists and a null title.
 {known_section}
 Return ONLY a valid JSON object with this structure:
 {{
     "title": "A short, descriptive title" or null,
-    "ingredients": ["item 1", "item 2"],
+    "ingredients": ["--- group name (only if the recipe has groups) ---", "item 1", "item 2"],
     "instructions": ["step 1", "step 2"],
     "prep_time": null,
     "cook_time": null,
