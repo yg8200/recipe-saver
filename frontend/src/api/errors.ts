@@ -24,6 +24,7 @@ const TRANSLATIONS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/'name' is required/, () => 'נא לתת לתיקייה שם.'],
   [/'name' must be at most/, () => 'שם התיקייה ארוך מדי (עד 100 תווים).'],
   [/Folder with id \d+ not found/, () => 'התיקייה לא נמצאה.'],
+  [/'rating' must be/, () => 'הדירוג חייב להיות בין 1 ל־5 כוכבים.'],
   [/Recipe with id \d+ not found/, () => 'המתכון לא נמצא.'],
   [/Request body must be a valid JSON/, () => 'הבקשה אינה תקינה.'],
 ]

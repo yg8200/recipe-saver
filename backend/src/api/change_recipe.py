@@ -42,6 +42,13 @@ def update_recipe(recipe_id: int):
                 return jsonify({"error": f"'{field}' must be a non-negative integer or null"}), 400
             updates[field] = val
 
+    if "rating" in data:
+        rating = data["rating"]
+        # null clears the rating; otherwise a whole number 1-5 (bool is an int subclass in Python, so exclude it)
+        if rating is not None and (not isinstance(rating, int) or isinstance(rating, bool) or not 1 <= rating <= 5):
+            return jsonify({"error": "'rating' must be an integer from 1 to 5 or null"}), 400
+        updates["rating"] = rating
+
     if "title" in updates:
         existing = (
             db.session.query(Recipe)

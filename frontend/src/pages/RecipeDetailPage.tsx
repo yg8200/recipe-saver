@@ -1,9 +1,10 @@
 import { Link, useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/client'
-import { useDeleteRecipe, useRecipe } from '../api/recipes'
+import { useDeleteRecipe, useRecipe, useUpdateRecipe } from '../api/recipes'
 import FolderPicker from '../components/FolderPicker'
 import { secondaryButtonClass } from '../components/RecipeForm'
 import RecipeMeta from '../components/RecipeMeta'
+import StarRating from '../components/StarRating'
 import { ErrorMessage, Spinner } from '../components/StatusViews'
 import { imageSrc } from '../utils/imageUrl'
 import NotFoundPage from './NotFoundPage'
@@ -22,6 +23,7 @@ export default function RecipeDetailPage() {
   const id = Number(useParams().id) // URL params are always strings
   const { data: recipe, isPending, error, refetch } = useRecipe(id)
   const deleteRecipe = useDeleteRecipe()
+  const updateRecipe = useUpdateRecipe(id)
   const navigate = useNavigate()
 
   if (isPending) return <Spinner />
@@ -49,6 +51,8 @@ export default function RecipeDetailPage() {
               <span className="inline-block rtl:rotate-180">←</span> כל המתכונים
             </Link>
             <h1 dir="auto" className="text-3xl font-bold leading-tight">{recipe.title}</h1>
+            <StarRating value={recipe.rating} onChange={(rating) => updateRecipe.mutate({ rating })} disabled={updateRecipe.isPending} />
+            {updateRecipe.error && <ErrorMessage error={updateRecipe.error} />}
             <RecipeMeta recipe={recipe} />
           </div>
         </div>
