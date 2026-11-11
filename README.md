@@ -1,7 +1,8 @@
 # Recipe Saver
 
 Save recipes from a **website link**, a **YouTube video** or a **photo of a cookbook page**.
-AI extracts the recipe, and you browse, search, edit and delete it in a React app.
+AI extracts the recipe, and you browse, search, edit and delete it in a React app. Recipes can be
+organised into folders (a recipe can be in several), including by dragging a recipe onto a folder.
 The interface is in Hebrew with a full right-to-left layout (English recipes still display correctly).
 
 <!-- Add a screenshot or GIF here: ![Recipe Saver](docs/screenshot.png) -->
@@ -18,7 +19,7 @@ Every extraction passes a deterministic validator before it reaches the database
 
 ## Tech stack
 
-- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (179 tests, 96% coverage), Alembic migrations
+- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (195 tests, 96% coverage), Alembic migrations
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query
 - **AI:** OpenAI (extraction and correction), Google Gemini (photo OCR)
 - **Infra:** Docker Compose (Postgres, backend, nginx-served frontend, pgAdmin)
@@ -81,6 +82,9 @@ When a photo goes wrong in real use, add that recipe to `backend/evals/corrector
 | POST | `/recipes/<id>/image` | Add or replace the dish photo (multipart field `image`) |
 | DELETE | `/recipes/<id>/image` | Remove the dish photo |
 | GET | `/images/<file>` | Serve a stored photo |
+| GET / POST | `/folders` | List folders with recipe counts / create a folder |
+| PATCH / DELETE | `/folders/<id>` | Rename a folder / delete it (its recipes are kept) |
+| PUT / DELETE | `/folders/<id>/recipes/<recipe_id>` | Add a recipe to a folder (idempotent) / remove it from the folder |
 | GET | `/health` | Health check |
 
 A Postman collection with every endpoint is in `backend/Recipe_Saver.postman_collection.json`.
@@ -92,6 +96,10 @@ A Postman collection with every endpoint is in `backend/Recipe_Saver.postman_col
   and can't invent a URL. Photos are downloaded, re-encoded as resized JPEGs and stored on disk
   (`backend/uploads/`); the database keeps only the file name. Downloads refuse non-public addresses
   (SSRF protection) and a missing photo never blocks saving the recipe.
+- **Folders are many-to-many.** A `recipe_folders` link table (composite primary key, `ON DELETE CASCADE`)
+  lets one recipe live in several folders, and deleting a folder only removes the links, never the recipes.
+  Adding a recipe is an idempotent `PUT`. The recipe list loads all links in one extra query
+  (`selectinload`) to avoid the N+1 problem. In the UI a folder is a tile you can drag recipe cards onto.
 - **Schema changes go through Alembic** (`backend/migrations/`). The migrations are idempotent, so the same
   `upgrade` works on a brand-new database and on one created earlier by `db.create_all()`.
 - **Two AI providers, each for what it does best.** Gemini reads the image and OpenAI edits text.

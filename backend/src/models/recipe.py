@@ -28,5 +28,7 @@ class Recipe(db.Model):
         "cook_time_minutes": self.cook_time_minutes,
         "servings": self.servings,
         "image_url": f"/images/{self.image_filename}" if self.image_filename else None,
+        # Ids of the folders this recipe is in (the list is built from the Recipe.folders backref)
+        "folder_ids": sorted(folder.id for folder in self.folders),
         "created_at": self.created_at.isoformat() if self.created_at else None,
     }

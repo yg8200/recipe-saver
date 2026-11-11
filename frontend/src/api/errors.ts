@@ -20,6 +20,10 @@ const TRANSLATIONS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/No image file provided|Empty file name/, () => 'לא נבחרה תמונה.'],
   [/too large/, () => 'התמונה גדולה מדי (עד 16MB).'],
   [/not a valid or supported image/, () => 'הקובץ אינו תמונה תקינה. נסו JPEG, PNG או HEIC.'],
+  [/A folder with the name '(.+)' already exists/, (m) => `כבר יש תיקייה בשם “${m[1]}”.`],
+  [/'name' is required/, () => 'נא לתת לתיקייה שם.'],
+  [/'name' must be at most/, () => 'שם התיקייה ארוך מדי (עד 100 תווים).'],
+  [/Folder with id \d+ not found/, () => 'התיקייה לא נמצאה.'],
   [/Recipe with id \d+ not found/, () => 'המתכון לא נמצא.'],
   [/Request body must be a valid JSON/, () => 'הבקשה אינה תקינה.'],
 ]

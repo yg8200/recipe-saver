@@ -1,6 +1,7 @@
 from flask_migrate import upgrade
 from src import create_app
-from src.models.recipe import Recipe  # Ensures Recipe is registered with SQLAlchemy
+from src.models.recipe import Recipe  # Ensures the models are registered with SQLAlchemy
+from src.models.folder import Folder
 
 app = create_app()
 

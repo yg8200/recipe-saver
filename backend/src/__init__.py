@@ -11,6 +11,7 @@ from src.api.get_recipe import get_recipe_bp
 from src.api.extract_recipe import extract_recipe_bp
 from src.api.upload_recipe import upload_recipe_bp
 from src.api.recipe_image import recipe_image_bp
+from src.api.folders import folders_bp
 
 def create_app(config_name: str | None = None) -> Flask:
     app = Flask(__name__)
@@ -31,6 +32,7 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(extract_recipe_bp)
     app.register_blueprint(upload_recipe_bp)
     app.register_blueprint(recipe_image_bp)
+    app.register_blueprint(folders_bp)
 
     @app.errorhandler(413)
     def too_large(_error):

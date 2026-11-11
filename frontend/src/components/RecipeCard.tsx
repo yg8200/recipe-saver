@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import type { Recipe } from '../api/types'
 import { textDirection } from '../utils/textDirection'
+import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
 import { imageSrc } from '../utils/imageUrl'
 import RecipeMeta from './RecipeMeta'
 
@@ -12,6 +13,13 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
   return (
     <Link
       to={`/recipes/${recipe.id}`}
+      // Drag the card onto a folder tile to add the recipe to that folder. "copy" because the
+      // recipe stays where it is (it can be in several folders).
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData(RECIPE_DRAG_TYPE, String(recipe.id))
+        e.dataTransfer.effectAllowed = 'copy'
+      }}
       dir={textDirection(recipe.title)}
       className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-brand-100 bg-surface p-6 pt-7 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg hover:shadow-brand-200/40"
     >
