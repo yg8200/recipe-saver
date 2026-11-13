@@ -47,3 +47,10 @@ def test_editing_other_fields_keeps_rating(client):
     client.patch(f"/recipes/{recipe_id}", json={"rating": 5})
     client.patch(f"/recipes/{recipe_id}", json={"title": "Better Pancakes"})
     assert client.get(f"/recipes/{recipe_id}").get_json()["rating"] == 5
+
+
+# Rating a recipe that does not exist returns 404 with a clear message.
+def test_patch_rating_non_existent_recipe(client):
+    response = client.patch("/recipes/999", json={"rating": 3})
+    assert response.status_code == 404
+    assert response.get_json()["error"] == "Recipe with id 999 not found"

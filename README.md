@@ -20,7 +20,7 @@ Every extraction passes a deterministic validator before it reaches the database
 
 ## Tech stack
 
-- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (211 tests, 96% coverage), Alembic migrations
+- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (226 tests, 96% coverage), Alembic migrations
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query
 - **AI:** OpenAI (extraction and correction), Google Gemini (photo OCR)
 - **Infra:** Docker Compose (Postgres, backend, nginx-served frontend, pgAdmin)
@@ -73,7 +73,8 @@ When a photo goes wrong in real use, add that recipe to `backend/evals/corrector
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/recipes` | List recipes (oldest first) |
+| GET | `/recipes` | List recipes (oldest first). Optional `?min_rating=1..5` keeps only recipes rated at least that many stars |
+| GET | `/recipes/random` | One random recipe (404 when there are none) |
 | GET | `/recipes/<id>` | Get one recipe |
 | POST | `/recipes` | Create a recipe manually |
 | PUT / PATCH | `/recipes/<id>` | Update a recipe (also sets the 1-5 star `rating`; `null` clears it) |
