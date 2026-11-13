@@ -82,6 +82,71 @@
           ]
         },
         {
+          "name": "Get Recipes by Min Rating",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes?min_rating=4",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes"
+              ],
+              "query": [
+                {
+                  "key": "min_rating",
+                  "value": "4"
+                }
+              ]
+            },
+            "description": "Only recipes rated 4 stars or more (unrated ones are left out). min_rating must be an integer from 1 to 5, otherwise 400."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Random Recipe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recipes/random",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "recipes",
+                "random"
+              ]
+            },
+            "description": "One random recipe (\"what should I cook today?\"). 404 when there are no recipes."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Get Recipe by ID",
           "request": {
             "method": "GET",
