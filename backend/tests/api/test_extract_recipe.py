@@ -4,6 +4,7 @@ import pytest
 
 from src.api.extract_recipe import validate_extracted_recipe
 from src.schemas.recipe_schema import RecipeExtracted
+from src.services.facebook_extractor import FacebookPost
 from src.services.scraper import ScrapedPage
 from src.services.youtube_extractor import get_youtube_video_id, is_youtube_url
 
@@ -102,6 +103,36 @@ def test_extract_routes_youtube_urls(client):
     assert response.status_code == 201
     yt.assert_called_once()
     scraper.assert_not_called()
+
+
+# Facebook URLs go to the Facebook extractor, and its thumbnail becomes the dish photo.
+def test_extract_routes_facebook_urls(client, jpeg_bytes, monkeypatch):
+    tried = []
+
+    def fake_download(url):
+        tried.append(url)
+        return jpeg_bytes
+
+    monkeypatch.setattr("src.services.recipe_image.download_image", fake_download)
+    post = FacebookPost(caption="caption", thumbnail_url="https://cdn.example.com/t.jpg")
+    data = {"title": "FB Pie", "ingredients": ["eggs"], "instructions": ["bake"]}
+    with patch("src.api.extract_recipe.get_facebook_post", return_value=post), \
+         patch("src.api.extract_recipe.extract_recipe_from_facebook_caption", return_value=data) as extract, \
+         patch("src.api.extract_recipe.scrape_recipe") as scraper:
+        response = client.post("/recipes/extract", json={"url": "https://www.facebook.com/reel/123"})
+    assert response.status_code == 201
+    assert response.get_json()["image_url"] is not None
+    extract.assert_called_once_with("caption")
+    assert tried == ["https://cdn.example.com/t.jpg"]
+    scraper.assert_not_called()
+
+
+# A Facebook post that cannot be read returns 400 with the message.
+def test_extract_facebook_error_returns_400(client):
+    with patch("src.api.extract_recipe.get_facebook_post", side_effect=ValueError("It may be private")):
+        response = client.post("/recipes/extract", json={"url": "https://fb.watch/abc"})
+    assert response.status_code == 400
+    assert "private" in response.get_json()["error"]
 
 
 # A non-JSON body, a JSON list, or an empty url returns 400.
