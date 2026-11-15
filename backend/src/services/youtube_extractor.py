@@ -46,7 +46,7 @@ def get_video_description(url: str) -> str:
         return ""
 
 EXTRACTION_PROMPT = """
-You are an expert culinary assistant analyzing text from a YouTube cooking video ({source}).
+You are an expert culinary assistant analyzing text from a cooking video ({source}).
 
 CRITICAL RULES:
 1. ONLY EXTRACT WHAT IS THERE: Extract ingredients and instructions only if they actually appear in the text.

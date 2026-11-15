@@ -1,6 +1,6 @@
 # Recipe Saver
 
-Save recipes from a **website link**, a **YouTube video** or a **photo of a cookbook page**.
+Save recipes from a **website link**, a **YouTube video**, a **Facebook video/Reel** or a **photo of a cookbook page**.
 AI extracts the recipe, and you browse, search, edit and delete it in a React app. Recipes can be
 organised into folders (a recipe can be in several), including by dragging a recipe onto a folder,
 and rated with 1 to 5 stars.
@@ -14,13 +14,14 @@ The interface is in Hebrew with a full right-to-left layout (English recipes sti
 |---|---|
 | **Website** | Scraped with `curl_cffi` (Chrome TLS fingerprint) and `BeautifulSoup`, then OpenAI extracts it into a Pydantic schema. |
 | **YouTube** | The video description is tried first. The transcript is used only to fill in what is missing (e.g. ingredients without steps). |
+| **Facebook** | Public videos and Reels, read with `yt-dlp` without a login. The recipe must be written in the post's caption (Facebook has no transcript). Private posts are not supported. |
 | **Photo** (JPEG, PNG, HEIC) | The image is resized, Gemini reads the text, then OpenAI fixes OCR typos and returns only the lines it changed. |
 
 Every extraction passes a deterministic validator before it reaches the database.
 
 ## Tech stack
 
-- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (226 tests, 96% coverage), Alembic migrations
+- **Backend:** Flask, SQLAlchemy, PostgreSQL, Pydantic, pytest (244 tests, 96% coverage), Alembic migrations
 - **Frontend:** React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query
 - **AI:** OpenAI (extraction and correction), Google Gemini (photo OCR)
 - **Infra:** Docker Compose (Postgres, backend, nginx-served frontend, pgAdmin)
@@ -79,7 +80,7 @@ When a photo goes wrong in real use, add that recipe to `backend/evals/corrector
 | POST | `/recipes` | Create a recipe manually |
 | PUT / PATCH | `/recipes/<id>` | Update a recipe (also sets the 1-5 star `rating`; `null` clears it) |
 | DELETE | `/recipes/<id>` | Delete a recipe |
-| POST | `/recipes/extract` | Extract from `{"url": "..."}` (website or YouTube). Also saves the page's main image or the video thumbnail as the dish photo |
+| POST | `/recipes/extract` | Extract from `{"url": "..."}` (website, YouTube or Facebook). Also saves the page's main image or the video thumbnail as the dish photo |
 | POST | `/recipes/upload` | Extract from a photo (multipart field `image`) |
 | POST | `/recipes/<id>/image` | Add or replace the dish photo (multipart field `image`) |
 | DELETE | `/recipes/<id>/image` | Remove the dish photo |

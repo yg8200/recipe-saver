@@ -66,10 +66,20 @@ function isYouTube(url: string) {
   }
 }
 
+function isFacebook(url: string) {
+  try {
+    const host = new URL(url).hostname
+    return host === 'fb.watch' || host === 'facebook.com' || host.endsWith('.facebook.com')
+  } catch {
+    return false
+  }
+}
+
 function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
   const [url, setUrl] = useState('')
   const extract = useExtractFromUrl()
   const youtube = isYouTube(url)
+  const facebook = isFacebook(url)
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -79,7 +89,7 @@ function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <label className="block">
-        <span className="mb-1.5 block text-sm font-medium">אתר מתכונים או סרטון יוטיוב</span>
+        <span className="mb-1.5 block text-sm font-medium">אתר מתכונים, סרטון יוטיוב או פוסט בפייסבוק</span>
         <input
           type="url"
           required
@@ -96,12 +106,14 @@ function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
         <p className="text-sm text-ink/60">
           {youtube
             ? '▶️ סרטון יוטיוב: המתכון נקרא מתיאור הסרטון, והתמלול משלים את מה שחסר. תמונת הסרטון נשמרת כתמונת המנה.'
+            : facebook
+            ? '📘 פייסבוק: המתכון נקרא מטקסט הפוסט (חייב להיות כתוב שם), ותמונת הסרטון נשמרת כתמונת המנה. פוסטים פרטיים לא נתמכים.'
             : '🌐 אתר: הדף נקרא והמתכון מחולץ באמצעות בינה מלאכותית. אם יש בדף תמונה של המנה, היא נשמרת גם.'}
         </p>
       )}
 
       {extract.isPending ? (
-        <Working message={() => (youtube ? 'קוראים את הסרטון…' : 'קוראים את הדף…')} />
+        <Working message={() => (youtube || facebook ? 'קוראים את הסרטון…' : 'קוראים את הדף…')} />
       ) : (
         <button type="submit" className={primaryButtonClass}>חילוץ מתכון</button>
       )}

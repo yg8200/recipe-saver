@@ -9,6 +9,9 @@ from src.services.scraper import scrape_recipe
 from src.services.image_store import delete_recipe_image
 from src.services.recipe_image import fetch_and_store_image, youtube_thumbnail_urls
 from src.services.ai_extractor import extract_recipe_from_text
+from src.services.facebook_extractor import (
+    extract_recipe_from_facebook_caption, get_facebook_post, is_facebook_url,
+)
 from src.services.youtube_extractor import extract_recipe_from_youtube, get_youtube_video_id, is_youtube_url
 
 extract_recipe_bp = Blueprint("extract_recipe", __name__)
@@ -77,6 +80,11 @@ def extract_recipe():
             # The YouTube extractor now handles description vs transcript logic internally
             raw_extracted = extract_recipe_from_youtube(url)
             image_candidates = youtube_thumbnail_urls(get_youtube_video_id(url))
+        elif is_facebook_url(url):
+            # Facebook: the recipe must be in the caption; the video thumbnail becomes the dish photo
+            post = get_facebook_post(url)
+            raw_extracted = extract_recipe_from_facebook_caption(post.caption)
+            image_candidates = [post.thumbnail_url]
         else:
             # Standard webpage scraping: one fetch gives both the text and the page's main image
             page = scrape_recipe(url)

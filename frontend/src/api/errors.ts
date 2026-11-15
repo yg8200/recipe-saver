@@ -13,6 +13,8 @@ const TRANSLATIONS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/Could not extract readable text/, () => 'לא נמצא בדף טקסט שאפשר לקרוא.'],
   [/Invalid YouTube URL/, () => 'קישור היוטיוב אינו תקין.'],
   [/transcript is unavailable|Could not retrieve the video transcript/, () => 'לא נמצא מתכון בתיאור הסרטון, ואין לו תמלול זמין.'],
+  [/Could not read this Facebook post/, () => 'לא הצלחנו לקרוא את הפוסט בפייסבוק. ייתכן שהוא פרטי או שפייסבוק חסם את הבקשה.'],
+  [/complete recipe in the Facebook post caption/, () => 'לא נמצא מתכון מלא בטקסט של הפוסט. נתמכים רק מתכונים שכתובים בטקסט הפוסט.'],
   [/Could not find a complete recipe/, () => 'לא הצלחנו למצוא מתכון מלא בסרטון.'],
   [/No ingredients were found/, () => 'לא נמצאו מצרכים במקור הזה.'],
   [/No instructions were found/, () => 'לא נמצאו הוראות הכנה במקור הזה.'],
