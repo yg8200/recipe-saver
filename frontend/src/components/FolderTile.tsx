@@ -91,12 +91,11 @@ export default function FolderTile({ folder }: { folder: Folder }) {
 }
 
 // The last tile of the grid: a dashed square that creates a new folder.
-export function NewFolderTile({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
+export function NewFolderTile({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
-      className={`${tileBase} group border border-dashed border-brand-200 bg-surface/60 text-ink/60 hover:border-brand-600 hover:text-brand-600 disabled:opacity-60`}
+      className={`${tileBase} group border border-dashed border-brand-200 bg-surface/60 text-ink/60 hover:border-brand-600 hover:text-brand-600`}
     >
       <span aria-hidden className="mb-2 grid size-11 place-items-center rounded-2xl bg-brand-50 text-2xl leading-none transition">+</span>
       <span className="text-sm font-semibold">תיקייה חדשה</span>

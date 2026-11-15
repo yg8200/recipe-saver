@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useCreateFolder, useFolders } from '../api/folders'
 import FolderTile, { NewFolderTile } from './FolderTile'
+import NewFolderForm from './NewFolderForm'
 import { ErrorMessage } from './StatusViews'
 
 // The "Folders" section on the home page: a grid of square tiles plus a "new folder" tile.
@@ -9,9 +11,9 @@ export default function FolderGrid() {
   const createFolder = useCreateFolder()
   const navigate = useNavigate()
 
-  function handleCreate() {
-    const name = window.prompt('שם התיקייה החדשה (למשל: המנות של סבתא)')?.trim()
-    if (!name) return
+  const [creating, setCreating] = useState(false)
+
+  function handleCreate(name: string) {
     // Open the new folder right away, so the user can see it and start filling it
     createFolder.mutate(name, { onSuccess: (folder) => navigate(`/folders/${folder.id}`) })
   }
@@ -26,7 +28,16 @@ export default function FolderGrid() {
         {folders.map((folder) => (
           <FolderTile key={folder.id} folder={folder} />
         ))}
-        <NewFolderTile onClick={handleCreate} disabled={createFolder.isPending} />
+        {creating ? (
+          <NewFolderForm
+            onSubmit={handleCreate}
+            onCancel={() => setCreating(false)}
+            pending={createFolder.isPending}
+            className="col-span-2 flex flex-col justify-center gap-2 rounded-2xl border border-dashed border-brand-600 bg-surface/60 p-4 sm:col-span-1"
+          />
+        ) : (
+          <NewFolderTile onClick={() => setCreating(true)} />
+        )}
       </div>
       {(createFolder.error ?? error) && <ErrorMessage error={(createFolder.error ?? error)!} />}
     </section>
