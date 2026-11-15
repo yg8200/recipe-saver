@@ -14,33 +14,33 @@
     components need no changes: 50 = raised surface (hover/tile background), 100 = border, 200 = stronger
     border, 500/600 = the orange itself, 700 = orange used as TEXT (darker in light mode for contrast).
   */
-  --color-brand-50: #f3ece2;
-  --color-brand-100: #e6dcce;
-  --color-brand-200: #cfc3b4;
+  --color-brand-50: #f6e0c4;
+  --color-brand-100: #e6cba8;
+  --color-brand-200: #d3b088;
   --color-brand-500: #f58238;
   --color-brand-600: #e86a24;
-  --color-brand-700: #c4560f;
+  --color-brand-700: #b9500c;
   --color-brand-hover: #d95814;
 
   /* Green accent: tints for backgrounds/borders, 500 solid, 700 for text */
-  --color-herb-50: #e9f5ef;
-  --color-herb-100: #bce0ce;
+  --color-herb-50: #dcebd3;
+  --color-herb-100: #bdd8ae;
   --color-herb-500: #3d7a5a;
-  --color-herb-700: #2f6b4d;
+  --color-herb-700: #2a6445;
 
   /* Page, card, form-field and text colors */
-  --color-cream: #faf6f0;
-  --color-surface: #ffffff;
-  --color-field: #faf6f0;
-  --color-ink: #241b15;
+  --color-cream: #f0e1c8;
+  --color-surface: #fbf0dc;
+  --color-field: #f7e8d0;
+  --color-ink: #2a1f17;
 
   /* Rating stars */
   --color-star: #f59e0b;
 
   /* Errors and destructive actions */
   --color-danger: #b42318;
-  --color-danger-bg: #fbe4e0;
-  --color-danger-line: #f0b9b1;
+  --color-danger-bg: #f6d9d0;
+  --color-danger-line: #e8b3a6;
 
   /* Home banner gradient */
   --color-hero-from: #d4621c;

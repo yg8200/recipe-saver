@@ -1,18 +1,14 @@
 import { Link } from 'react-router'
-import { useFolders } from '../api/folders'
 import type { Recipe } from '../api/types'
 import { textDirection } from '../utils/textDirection'
 import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
 import { imageSrc } from '../utils/imageUrl'
 
-// A small dark label that sits on top of the photo (time, rating, folder)
+// A small dark label that sits on top of the photo (time, rating)
 const chipClass = 'flex items-center gap-1 rounded-lg border border-white/10 bg-black/60 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-md'
 
 // One recipe in the grid on the home page. The whole card is a link to the recipe page.
 export default function RecipeCard({ recipe }: { recipe: Recipe }) {
-  const { data: folders } = useFolders() // already cached by the folder grid, so no extra request
-  const folderName = folders?.find((f) => recipe.folder_ids.includes(f.id))?.name
-
   // Section headers like "--- לשכבת השקדים ---" aren't real ingredients, so skip them
   const ingredients = recipe.ingredients.filter((line) => !line.startsWith('---'))
   const totalMinutes = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0)
@@ -36,23 +32,17 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
       className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-brand-100 bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand-600/70 hover:shadow-xl"
     >
       <div>
-        {/* Photo with the time, rating and folder on top. Without a photo, a neutral block keeps the grid even. */}
+        {/* Photo with the time and rating on top. Without a photo, a neutral block keeps the grid even. */}
         <div className="relative h-48 overflow-hidden bg-brand-50">
           {recipe.image_url && (
             <img
               src={imageSrc(recipe.image_url)!}
               alt=""
               loading="lazy"
-              className="size-full object-cover transition duration-500 group-hover:scale-105"
+              className="size-full object-cover"
             />
           )}
           <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#120e0b]/85 via-transparent to-black/20" />
-
-          {folderName && (
-            <span dir="auto" className="absolute end-3 top-3 max-w-[70%] truncate rounded-lg border border-amber-200/15 bg-[#1b1511]/85 px-2.5 py-1 text-[11px] font-bold text-amber-200 backdrop-blur-md">
-              {folderName}
-            </span>
-          )}
 
           <div className="absolute inset-x-3 bottom-3 flex items-center justify-between">
             {totalMinutes > 0 ? (

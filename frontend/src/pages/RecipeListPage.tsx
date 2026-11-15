@@ -32,9 +32,6 @@ export default function RecipeListPage() {
         <span aria-hidden className="pointer-events-none absolute start-36 -top-20 size-44 rounded-full bg-amber-300/[0.06]" />
         <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="space-y-1.5">
-            <span className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-xs font-semibold text-amber-100 backdrop-blur-sm">
-              ספר המתכונים המשפחתי
-            </span>
             <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">המתכונים שלי</h1>
             <p className="text-sm font-medium text-amber-100/90">
               {recipes.length === 1 ? 'מתכון אחד שמור' : `${recipes.length} מתכונים שמורים`} • מה מבשלים היום?
