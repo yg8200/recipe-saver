@@ -4,6 +4,7 @@
 const TRANSLATIONS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/A recipe with the title '(.+)' already exists/, (m) => `כבר יש מתכון בשם “${m[1]}”.`],
   [/A recipe with this title already exists/, () => 'כבר יש מתכון עם השם הזה.'],
+  [/A recipe from this link already exists/, () => 'הקישור הזה כבר חולץ בעבר והמתכון נשמר אצלנו.'],
   [/'title' is required|'title' must be a non-empty string/, () => 'נא לתת למתכון שם.'],
   [/'ingredients' is required|'ingredients' must be a non-empty list/, () => 'נא להוסיף לפחות מצרך אחד.'],
   [/'instructions' is required|'instructions' must be a non-empty list/, () => 'נא להוסיף לפחות שלב אחד.'],

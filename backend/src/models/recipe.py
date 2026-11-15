@@ -14,6 +14,8 @@ class Recipe(db.Model):
   servings = db.Column(db.Integer, nullable=True)
   # Star rating from 1 to 5, or NULL when the recipe has not been rated yet
   rating = db.Column(db.SmallInteger, nullable=True)
+  # The link this recipe was extracted from, or NULL for manual and photo recipes (and recipes saved before this column existed)
+  source_url = db.Column(db.String(2048), nullable=True)
   # Name of the dish photo inside UPLOAD_FOLDER (e.g. "3f2a....jpg"), or NULL when there is no photo
   image_filename = db.Column(db.String(100), nullable=True)
   created_at = db.Column(
@@ -30,6 +32,7 @@ class Recipe(db.Model):
         "cook_time_minutes": self.cook_time_minutes,
         "servings": self.servings,
         "rating": self.rating,
+        "source_url": self.source_url,
         "image_url": f"/images/{self.image_filename}" if self.image_filename else None,
         # Ids of the folders this recipe is in (the list is built from the Recipe.folders backref)
         "folder_ids": sorted(folder.id for folder in self.folders),

@@ -1,5 +1,6 @@
 import { useEffect, useState, type DragEvent, type FormEvent } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
+import { ApiError } from '../api/client'
 import { useCreateRecipe, useExtractFromImage, useExtractFromUrl, useUploadImage } from '../api/recipes'
 import ImageField from '../components/ImageField'
 import type { Recipe, RecipeInput } from '../api/types'
@@ -117,6 +118,14 @@ function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
       )}
 
       {extract.error && <ErrorMessage error={extract.error} />}
+      {extract.error instanceof ApiError && extract.error.existingRecipeId && (
+        <Link
+          to={`/recipes/${extract.error.existingRecipeId}`}
+          className="inline-block font-bold text-brand-700 underline"
+        >
+          לחצו כאן למעבר למתכון
+        </Link>
+      )}
     </form>
   )
 }
