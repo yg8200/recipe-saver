@@ -5,72 +5,73 @@
   becomes a utility class automatically, e.g. --color-brand-600 -> bg-brand-600, text-brand-600.
 */
 @theme {
-  --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
+  /* Heebo for text and Frank Ruhl Libre (a Hebrew serif) for the big titles. Both cover Hebrew and Latin. */
+  --font-sans: "Heebo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Frank Ruhl Libre", Georgia, serif;
 
   /*
-    A warm palette: sand surfaces, a tomato-orange accent and a herb-green second color.
-    The names brand-50..700 are kept so components do not change: 50/100/200 are neutral tints
-    (hover backgrounds, borders), 500-700 are the accent.
+    Orange is the main accent, green the second. The names brand-50..700 are kept from the old theme so
+    components need no changes: 50 = raised surface (hover/tile background), 100 = border, 200 = stronger
+    border, 500/600 = the orange itself, 700 = orange used as TEXT (darker in light mode for contrast).
   */
-  --color-brand-50: #f6dfc8;
-  --color-brand-100: #e6cfb2;
-  --color-brand-200: #d9b48a;
-  --color-brand-500: #ee6a35;
-  --color-brand-600: #cf4a17;
-  --color-brand-700: #a8380f;
-  --color-brand-hover: #b53d10;
+  --color-brand-50: #f3ece2;
+  --color-brand-100: #e6dcce;
+  --color-brand-200: #cfc3b4;
+  --color-brand-500: #f58238;
+  --color-brand-600: #e86a24;
+  --color-brand-700: #c4560f;
+  --color-brand-hover: #d95814;
 
-  /* Muted secondary tints (used for small badges) */
-  --color-herb-50: #dbe7d0;
-  --color-herb-100: #c4d9b4;
-  --color-herb-500: #5a9a5f;
-  --color-herb-700: #2f6139;
+  /* Green accent: tints for backgrounds/borders, 500 solid, 700 for text */
+  --color-herb-50: #e9f5ef;
+  --color-herb-100: #bce0ce;
+  --color-herb-500: #3d7a5a;
+  --color-herb-700: #2f6b4d;
 
-  /* Page, card and text colors: soft, low-glare grays (no near-white surfaces) */
-  --color-cream: #efe2cc;
-  --color-surface: #f9f1e1;
-  --color-ink: #2a211c;
+  /* Page, card, form-field and text colors */
+  --color-cream: #faf6f0;
+  --color-surface: #ffffff;
+  --color-field: #faf6f0;
+  --color-ink: #241b15;
 
   /* Rating stars */
-  --color-star: #b7791f;
-
-  /* Banner on the home page */
-  --color-hero-from: #c2410c;
-  --color-hero-to: #f59e0b;
+  --color-star: #f59e0b;
 
   /* Errors and destructive actions */
   --color-danger: #b42318;
-  --color-danger-bg: #efd5cf;
-  --color-danger-line: #deb0a6;
+  --color-danger-bg: #fbe4e0;
+  --color-danger-line: #f0b9b1;
+
+  /* Home banner gradient */
+  --color-hero-from: #d4621c;
+  --color-hero-to: #9e3f10;
 }
 
 /*
-  Dark mode. Every color above is a CSS variable, so switching themes just means
+  Dark ("espresso") mode. Every color above is a CSS variable, so switching themes just means
   redefining the same variables under .dark (set on <html> by the theme toggle).
 */
 .dark {
   color-scheme: dark;
 
-  --color-brand-50: #33211a;
-  --color-brand-100: #46291d;
-  --color-brand-200: #7a4228;
-  --color-brand-500: #ff8f63;
-  --color-brand-600: #d9531f;
-  --color-brand-700: #ffb08a;
-  --color-brand-hover: #e8622d;
+  --color-brand-50: #241d18;
+  --color-brand-100: #33271f;
+  --color-brand-200: #4a3b30;
+  --color-brand-500: #f58238;
+  --color-brand-600: #e86a24;
+  --color-brand-700: #f58238;
+  --color-brand-hover: #f58238;
 
-  --color-herb-50: #17261a;
-  --color-herb-100: #223a27;
-  --color-herb-500: #6fbf7b;
-  --color-herb-700: #9bd8a4;
+  --color-herb-50: #12261d;
+  --color-herb-100: #274e3c;
+  --color-herb-500: #3d7a5a;
+  --color-herb-700: #4e9a73;
 
-  --color-cream: #1a1411;
-  --color-surface: #261d18;
-  --color-ink: #f5ede7;
-  --color-star: #e0a73a;
-
-  --color-hero-from: #a63a14;
-  --color-hero-to: #d9831f;
+  --color-cream: #120e0b;
+  --color-surface: #1b1511;
+  --color-field: #14100d;
+  --color-ink: #f7f1eb;
+  --color-star: #fbbf24;
 
   --color-danger: #ffb4ab;
   --color-danger-bg: #3a1717;
@@ -82,13 +83,6 @@
 
 body {
   @apply bg-cream text-ink antialiased;
-  /* A faint warm glow at the top of the page */
-  background-image: radial-gradient(60rem 26rem at 50% -10rem, var(--color-brand-100), transparent 70%);
-  background-repeat: no-repeat;
-}
-
-h1, h2, h3 {
-  letter-spacing: -0.015em;
 }
 
 /* A long unbroken word or URL wraps instead of pushing the page wider than the screen */

@@ -47,7 +47,7 @@ export default function StarRating({ value, onChange, disabled }: Props) {
           onClick={() => onChange(value === n ? null : n)}
           className="rounded p-0.5 pointer-coarse:p-1.5 transition hover:scale-110 disabled:opacity-60"
         >
-          <Star filled={n <= shown} className="size-8 pointer-coarse:size-9" />
+          <Star filled={n <= shown} className="size-6 pointer-coarse:size-8" />
         </button>
       ))}
     </div>

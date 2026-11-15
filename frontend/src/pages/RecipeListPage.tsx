@@ -3,7 +3,6 @@ import { Link, useSearchParams } from 'react-router'
 import { useRecipes } from '../api/recipes'
 import FolderGrid from '../components/FolderGrid'
 import RecipeCard from '../components/RecipeCard'
-import { inputClass } from '../components/RecipeForm'
 import { EmptyState, ErrorMessage, Spinner } from '../components/StatusViews'
 
 export default function RecipeListPage() {
@@ -26,21 +25,24 @@ export default function RecipeListPage() {
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />
 
   return (
-    <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-500/20 sm:p-8">
+    <div className="space-y-9">
+      <section className="relative overflow-hidden rounded-3xl border border-amber-200/15 bg-gradient-to-l from-[#d4621c] via-[#c25416] to-hero-to p-6 text-white shadow-xl shadow-black/20 sm:p-8">
         {/* Decorative circles, purely visual */}
-        <span aria-hidden className="pointer-events-none absolute -start-10 -top-16 size-56 rounded-full bg-white/10" />
-        <span aria-hidden className="pointer-events-none absolute -bottom-20 start-1/3 size-48 rounded-full bg-white/10" />
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold sm:text-4xl">המתכונים שלי</h1>
-            <p className="mt-1 text-white/85">
-              {recipes.length === 1 ? 'מתכון אחד שמור' : `${recipes.length} מתכונים שמורים`} · מה מבשלים היום?
+        <span aria-hidden className="pointer-events-none absolute -start-10 -bottom-16 size-64 rounded-full bg-white/[0.07]" />
+        <span aria-hidden className="pointer-events-none absolute start-36 -top-20 size-44 rounded-full bg-amber-300/[0.06]" />
+        <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+          <div className="space-y-1.5">
+            <span className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-xs font-semibold text-amber-100 backdrop-blur-sm">
+              ספר המתכונים המשפחתי
+            </span>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">המתכונים שלי</h1>
+            <p className="text-sm font-medium text-amber-100/90">
+              {recipes.length === 1 ? 'מתכון אחד שמור' : `${recipes.length} מתכונים שמורים`} • מה מבשלים היום?
             </p>
           </div>
           {recipes.length > 0 && (
-            <label className="relative block sm:w-80">
-              <svg aria-hidden viewBox="0 0 24 24" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink/50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <label className="relative block w-full lg:max-w-md">
+              <svg aria-hidden viewBox="0 0 24 24" className="pointer-events-none absolute start-4 top-1/2 size-4 -translate-y-1/2 text-amber-200/70" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
               </svg>
               <input
@@ -48,9 +50,9 @@ export default function RecipeListPage() {
                 dir="auto"
                 value={query}
                 onChange={(e) => setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true })}
-                placeholder="חיפוש לפי שם או מצרך…"
+                placeholder="חיפוש לפי שם מתכון או מצרך…"
                 aria-label="חיפוש מתכונים"
-                className={`${inputClass} border-transparent text-ink ps-9`}
+                className="w-full rounded-2xl border border-amber-200/15 bg-[#16110e]/85 py-3.5 pe-4 ps-11 text-sm text-[#f7f1eb] shadow-inner outline-none backdrop-blur-md transition placeholder:text-amber-100/50 focus:border-amber-300/60"
               />
             </label>
           )}
@@ -70,8 +72,11 @@ export default function RecipeListPage() {
         <EmptyState title="לא נמצאו תוצאות">אין מתכון שמתאים ל־“{query}”.</EmptyState>
       ) : (
         <section className="space-y-4" aria-labelledby="recipes-heading">
-          <h2 id="recipes-heading" className="text-lg font-semibold">כל המתכונים</h2>
-          <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <div className="flex items-center gap-2.5">
+            <h2 id="recipes-heading" className="text-lg font-bold">כל המתכונים</h2>
+            <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-bold text-ink/60">{filtered.length}</span>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {filtered.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}

@@ -5,19 +5,20 @@ import type { Folder } from '../api/types'
 import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
 import FolderIcon from './FolderIcon'
 
-// Each folder gets its own color, picked by its id, so the tiles are easy to tell apart.
-// (Full class names are written out so Tailwind can see them at build time.)
+// Two tones, alternating by folder id: orange and green. (Full class names are written out
+// so Tailwind can see them at build time.)
 const TONES = [
-  { tile: 'bg-brand-50 border-brand-200', icon: 'text-brand-600' },
-  { tile: 'bg-herb-50 border-herb-100', icon: 'text-herb-700' },
-  { tile: 'bg-sky-100 border-sky-200 dark:bg-sky-950 dark:border-sky-900', icon: 'text-sky-600 dark:text-sky-300' },
-  { tile: 'bg-violet-100 border-violet-200 dark:bg-violet-950 dark:border-violet-900', icon: 'text-violet-600 dark:text-violet-300' },
-  { tile: 'bg-rose-100 border-rose-200 dark:bg-rose-950 dark:border-rose-900', icon: 'text-rose-600 dark:text-rose-300' },
-  { tile: 'bg-amber-100 border-amber-200 dark:bg-amber-950 dark:border-amber-900', icon: 'text-amber-600 dark:text-amber-300' },
+  {
+    tile: 'border-[#f3d1b8] bg-[#fdf1e8] hover:border-brand-600 dark:border-[#52301b] dark:bg-[#2a180d]',
+    icon: 'text-brand-600',
+  },
+  {
+    tile: 'border-herb-100 bg-herb-50 hover:border-herb-500',
+    icon: 'text-herb-500 dark:text-herb-700',
+  },
 ]
 
-const tileBase =
-  'group relative flex aspect-[4/3] flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl p-3 text-center transition'
+const tileBase = 'group relative flex flex-col items-center justify-center gap-0.5 overflow-hidden rounded-2xl p-5 text-center transition'
 
 // One folder as a square tile. The whole tile is a link that opens the folder page,
 // and also a drop target: drop a recipe card on it to add that recipe to the folder.
@@ -64,14 +65,16 @@ export default function FolderTile({ folder }: { folder: Folder }) {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragOver(false)
       }}
       onDrop={handleDrop}
-      className={`${tileBase} border hover:border-brand-200 hover:shadow-md hover:shadow-black/5 ${
+      className={`${tileBase} border ${
         dragOver
-          ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-500/40'
+          ? 'border-brand-600 bg-brand-50 ring-2 ring-brand-600/50 scale-[1.02]'
           : `${tone.tile} hover:shadow-md`
       }`}
     >
-      <FolderIcon className={`size-9 ${tone.icon}`} />
-      <span dir="auto" className="line-clamp-2 text-sm font-semibold leading-snug">
+      <span className={`mb-2 grid size-11 place-items-center rounded-2xl bg-white/80 transition group-hover:scale-110 dark:bg-black/25 ${tone.icon}`}>
+        <FolderIcon className="size-5" />
+      </span>
+      <span dir="auto" className="line-clamp-2 text-sm font-bold leading-snug">
         {folder.name}
       </span>
       <span role="status" className={`text-xs ${status === 'error' ? 'text-danger' : status ? 'font-medium text-brand-700' : 'text-ink/55'}`}>
@@ -93,10 +96,11 @@ export function NewFolderTile({ onClick, disabled }: { onClick: () => void; disa
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${tileBase} border border-dashed border-brand-200 text-ink/60 hover:text-ink hover:border-brand-500 disabled:opacity-60`}
+      className={`${tileBase} group border border-dashed border-brand-200 bg-surface/60 text-ink/60 hover:border-brand-600 hover:text-brand-600 disabled:opacity-60`}
     >
-      <span aria-hidden className="text-2xl leading-none">+</span>
-      <span className="text-sm font-medium">תיקייה חדשה</span>
+      <span aria-hidden className="mb-2 grid size-11 place-items-center rounded-2xl bg-brand-50 text-2xl leading-none transition">+</span>
+      <span className="text-sm font-semibold">תיקייה חדשה</span>
+      <span className="text-[11px] text-ink/45">ארגון לפי חג או קטגוריה</span>
     </button>
   )
 }

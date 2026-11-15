@@ -22,8 +22,8 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
   const failure = toggle.error ?? createFolder.error
 
   return (
-    <section className="space-y-3 rounded-xl border border-brand-100 bg-surface p-6 shadow-sm">
-      <h2 className="text-sm font-semibold text-ink/60">תיקיות</h2>
+    <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-100 bg-surface px-5 py-4">
+      <h2 className="text-xs font-bold text-ink/60">שיוך לתיקיות:</h2>
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label="תיקיות של המתכון">
         {folders.map((folder) => {
           const inFolder = recipe.folder_ids.includes(folder.id)
@@ -36,7 +36,7 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
               onClick={() => toggle.mutate({ folderId: folder.id, recipeId: recipe.id, inFolder })}
               className={`${chipClass(inFolder)} disabled:opacity-60`}
             >
-              {inFolder ? '✓ ' : <FolderIcon className="me-1.5 inline size-4 align-[-3px]" />}
+              <FolderIcon className="me-1.5 inline size-3.5 align-[-2px]" />{inFolder && '✓ '}
               {folder.name}
             </button>
           )
@@ -44,12 +44,12 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
         <button
           onClick={handleCreate}
           disabled={createFolder.isPending}
-          className="rounded-lg border border-dashed border-brand-200 px-3.5 py-1.5 pointer-coarse:py-2.5 text-sm font-medium text-brand-700 transition hover:bg-brand-50 disabled:opacity-60"
+          className="rounded-xl border border-dashed border-brand-200 px-3.5 py-1.5 pointer-coarse:py-2.5 text-xs font-semibold text-ink/60 transition hover:border-brand-600 hover:text-brand-600 disabled:opacity-60"
         >
           + תיקייה חדשה
         </button>
       </div>
-      {folders.length === 0 && <p className="text-sm text-ink/60">עוד אין תיקיות. צרו אחת כדי לארגן את המתכונים.</p>}
+      {folders.length === 0 && <p className="w-full text-sm text-ink/60">עוד אין תיקיות. צרו אחת כדי לארגן את המתכונים.</p>}
       {failure && <ErrorMessage error={failure} />}
     </section>
   )

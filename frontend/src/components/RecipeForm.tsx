@@ -134,8 +134,10 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 // Shared Tailwind class strings, exported so other pages style inputs/buttons the same way
 export const inputClass =
-  'w-full rounded-lg border border-brand-100 bg-surface px-3.5 py-2.5 pointer-coarse:py-3 outline-none transition placeholder:text-ink/40 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25'
+  'w-full rounded-xl border border-brand-100 bg-field px-3.5 py-2.5 pointer-coarse:py-3 text-sm outline-none transition placeholder:text-ink/40 focus:border-brand-600'
 export const primaryButtonClass =
-  'rounded-lg bg-brand-600 px-5 py-2.5 pointer-coarse:py-3 text-sm font-medium text-white transition hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-60'
+  'rounded-xl bg-brand-600 px-6 py-2.5 pointer-coarse:py-3 text-sm font-bold text-white shadow-md shadow-brand-600/25 transition hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60'
 export const secondaryButtonClass =
-  'rounded-lg border border-brand-100 bg-surface px-5 py-2.5 pointer-coarse:py-3 text-sm font-medium transition hover:border-brand-200 hover:bg-brand-50'
+  'rounded-xl border border-brand-100 bg-brand-50 px-5 py-2.5 pointer-coarse:py-3 text-sm font-bold transition hover:border-brand-600/50'
+export const dangerButtonClass =
+  'rounded-xl border border-danger-line bg-surface px-5 py-2.5 pointer-coarse:py-3 text-sm font-bold text-danger transition hover:bg-danger-bg disabled:opacity-60'

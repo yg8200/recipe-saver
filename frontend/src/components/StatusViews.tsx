@@ -26,7 +26,7 @@ export function ErrorMessage({ error, onRetry }: { error: Error; onRetry?: () =>
 
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed border-brand-200 px-6 py-16 text-center">
+    <div className="rounded-3xl border border-dashed border-brand-200 px-6 py-16 text-center">
       <h2 className="text-lg font-semibold">{title}</h2>
       <div className="mt-2 text-ink/60">{children}</div>
     </div>
