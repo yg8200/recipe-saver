@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import FolderIcon from './FolderIcon'
+import NewFolderForm from './NewFolderForm'
 import { useCreateFolder, useFolders, useToggleRecipeInFolder } from '../api/folders'
 import type { Recipe } from '../api/types'
 import { chipClass } from '../utils/chipClass'
@@ -10,12 +12,15 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
   const toggle = useToggleRecipeInFolder()
   const createFolder = useCreateFolder()
 
-  function handleCreate() {
-    const name = window.prompt('שם התיקייה החדשה')?.trim()
-    if (!name) return
+  const [creating, setCreating] = useState(false)
+
+  function handleCreate(name: string) {
     // Create the folder, then put this recipe straight into it
     createFolder.mutate(name, {
-      onSuccess: (folder) => toggle.mutate({ folderId: folder.id, recipeId: recipe.id, inFolder: false }),
+      onSuccess: (folder) => {
+        toggle.mutate({ folderId: folder.id, recipeId: recipe.id, inFolder: false })
+        setCreating(false)
+      },
     })
   }
 
@@ -41,13 +46,21 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
             </button>
           )
         })}
+        {creating ? (
+          <NewFolderForm
+            onSubmit={handleCreate}
+            onCancel={() => setCreating(false)}
+            pending={createFolder.isPending}
+            className="flex flex-wrap items-center gap-2"
+          />
+        ) : (
         <button
-          onClick={handleCreate}
-          disabled={createFolder.isPending}
+          onClick={() => setCreating(true)}
           className="rounded-xl border border-dashed border-brand-200 px-3.5 py-1.5 pointer-coarse:py-2.5 text-xs font-semibold text-ink/60 transition hover:border-brand-600 hover:text-brand-600 disabled:opacity-60"
         >
           + תיקייה חדשה
         </button>
+        )}
       </div>
       {folders.length === 0 && <p className="w-full text-sm text-ink/60">עוד אין תיקיות. צרו אחת כדי לארגן את המתכונים.</p>}
       {failure && <ErrorMessage error={failure} />}
