@@ -52,7 +52,7 @@ export default function ImageField({ savedSrc = null, onChoose, onRemove, busy =
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-5 text-center transition ${
+        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-5 text-center transition ${
           dragging ? 'border-brand-500 bg-brand-50' : 'border-brand-200 hover:bg-brand-50/50'
         }`}
       >

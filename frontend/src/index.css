@@ -5,84 +5,84 @@
   becomes a utility class automatically, e.g. --color-brand-600 -> bg-brand-600, text-brand-600.
 */
 @theme {
-  --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
+  /* Heebo for text and Frank Ruhl Libre (a Hebrew serif) for the big titles. Both cover Hebrew and Latin. */
+  --font-sans: "Heebo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Frank Ruhl Libre", Georgia, serif;
 
-  /* Warm tomato/coral brand color. Used for actions, links and highlights. */
-  --color-brand-50: #efd9bf;
-  --color-brand-100: #dcc3a3;
-  --color-brand-200: #d9a47a;
-  --color-brand-500: #ee6a35;
-  --color-brand-600: #cf4a17;
-  --color-brand-700: #a8380f;
-  --color-brand-hover: #b53d10; /* hover color for solid brand buttons */
+  /*
+    Orange is the main accent, green the second. The names brand-50..700 are kept from the old theme so
+    components need no changes: 50 = raised surface (hover/tile background), 100 = border, 200 = stronger
+    border, 500/600 = the orange itself, 700 = orange used as TEXT (darker in light mode for contrast).
+  */
+  --color-brand-50: #f6e0c4;
+  --color-brand-100: #e6cba8;
+  --color-brand-200: #d3b088;
+  --color-brand-500: #f58238;
+  --color-brand-600: #e86a24;
+  --color-brand-700: #b9500c;
+  --color-brand-hover: #d95814;
 
-  /* Fresh herb green as a friendly second accent (ingredients, time/servings badges) */
-  --color-herb-50: #d6e3c6;
-  --color-herb-100: #c2d6b0;
-  --color-herb-500: #5a9a5f;
-  --color-herb-700: #2f6139;
+  /* Green accent: tints for backgrounds/borders, 500 solid, 700 for text */
+  --color-herb-50: #dcebd3;
+  --color-herb-100: #bdd8ae;
+  --color-herb-500: #3d7a5a;
+  --color-herb-700: #2a6445;
 
-  /* Page, card and text colors. The light theme is deliberately soft (no near-white surfaces) to be easy on the eyes. */
-  --color-cream: #e6d9c3;
-  --color-surface: #f1e6d2;
-  --color-ink: #2f241e;
+  /* Page, card, form-field and text colors */
+  --color-cream: #f0e1c8;
+  --color-surface: #fbf0dc;
+  --color-field: #f7e8d0;
+  --color-ink: #2a1f17;
 
   /* Rating stars */
-  --color-star: #d08a00;
+  --color-star: #f59e0b;
 
   /* Errors and destructive actions */
   --color-danger: #b42318;
-  --color-danger-bg: #efd0c4;
-  --color-danger-line: #deab9d;
+  --color-danger-bg: #f6d9d0;
+  --color-danger-line: #e8b3a6;
 
-  /* Header banner on the home page */
-  --color-hero-from: #c2410c;
-  --color-hero-to: #ea580c;
+  /* Home banner gradient */
+  --color-hero-from: #d4621c;
+  --color-hero-to: #9e3f10;
 }
 
 /*
-  Dark mode. Every color above is a CSS variable, so switching themes just means
+  Dark ("espresso") mode. Every color above is a CSS variable, so switching themes just means
   redefining the same variables under .dark (set on <html> by the theme toggle).
-  No component needs a separate dark: class. Dark surfaces are warm browns, not pure
-  black, and the brand-700 text color becomes a light peach so it stays readable.
 */
 .dark {
   color-scheme: dark;
 
-  --color-brand-50: #2e1d15;
-  --color-brand-100: #43281b;
-  --color-brand-200: #7a4228;
-  --color-brand-500: #ff8f63;
-  --color-brand-600: #d9531f;
-  --color-brand-700: #ffb08a;
-  --color-brand-hover: #e8622d;
+  --color-brand-50: #241d18;
+  --color-brand-100: #33271f;
+  --color-brand-200: #4a3b30;
+  --color-brand-500: #f58238;
+  --color-brand-600: #e86a24;
+  --color-brand-700: #f58238;
+  --color-brand-hover: #f58238;
 
-  --color-herb-50: #17261a;
-  --color-herb-100: #223a27;
-  --color-herb-500: #6fbf7b;
-  --color-herb-700: #9bd8a4;
+  --color-herb-50: #12261d;
+  --color-herb-100: #274e3c;
+  --color-herb-500: #3d7a5a;
+  --color-herb-700: #4e9a73;
 
-  --color-cream: #181311;
-  --color-surface: #231c18;
-  --color-ink: #f5ede7;
-  --color-star: #f5b942;
+  --color-cream: #120e0b;
+  --color-surface: #1b1511;
+  --color-field: #14100d;
+  --color-ink: #f7f1eb;
+  --color-star: #fbbf24;
 
   --color-danger: #ffb4ab;
   --color-danger-bg: #3a1717;
   --color-danger-line: #7a2b2b;
-
-  --color-hero-from: #a63a14;
-  --color-hero-to: #d9531f;
 }
 
 /* Lets Tailwind's dark: variant work too, driven by the same .dark class */
 @custom-variant dark (&:where(.dark, .dark *));
 
 body {
-  /* A soft warm glow at the top gives the page depth without adding noise */
   @apply bg-cream text-ink antialiased;
-  background-image: radial-gradient(60rem 28rem at 50% -8rem, var(--color-brand-100), transparent 70%);
-  background-repeat: no-repeat;
 }
 
 /* A long unbroken word or URL wraps instead of pushing the page wider than the screen */

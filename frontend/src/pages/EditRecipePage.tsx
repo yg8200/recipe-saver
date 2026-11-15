@@ -18,7 +18,7 @@ export default function EditRecipePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
-      <h1 className="text-3xl font-bold">עריכת מתכון</h1>
+      <h1 className="text-3xl font-semibold">עריכת מתכון</h1>
 
       {/* The photo is saved as soon as it is chosen, separately from the "save changes" button below */}
       <section className="space-y-2">

@@ -1,21 +1,21 @@
 import type { Recipe } from '../api/types'
 
-// Prep / cook / servings badges. Fields that are null are simply not shown.
+// Prep / cook / servings as one quiet line of text. Fields that are null are simply not shown.
 export default function RecipeMeta({ recipe }: { recipe: Recipe }) {
   const items = [
-    recipe.prep_time_minutes != null && { icon: '🔪', label: `${recipe.prep_time_minutes} דק׳ הכנה` },
-    recipe.cook_time_minutes != null && { icon: '🔥', label: `${recipe.cook_time_minutes} דק׳ בישול` },
-    recipe.servings != null && { icon: '🍽️', label: recipe.servings === 1 ? 'מנה אחת' : `${recipe.servings} מנות` },
-  ].filter((item) => item !== false)
+    recipe.prep_time_minutes != null && `${recipe.prep_time_minutes} דק׳ הכנה`,
+    recipe.cook_time_minutes != null && `${recipe.cook_time_minutes} דק׳ בישול`,
+    recipe.servings != null && (recipe.servings === 1 ? 'מנה אחת' : `${recipe.servings} מנות`),
+  ].filter((item): item is string => item !== false)
 
   if (items.length === 0) return null
 
   return (
-    <ul className="flex flex-wrap gap-2 text-sm">
-      {items.map((item) => (
-        <li key={item.label} className="flex items-center gap-1 rounded-full bg-herb-50 px-3 py-1 text-herb-700">
-          <span aria-hidden>{item.icon}</span>
-          {item.label}
+    <ul className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-ink/60">
+      {items.map((label, i) => (
+        <li key={label} className="flex gap-2">
+          {i > 0 && <span aria-hidden className="text-ink/30">·</span>}
+          {label}
         </li>
       ))}
     </ul>

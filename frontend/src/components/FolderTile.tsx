@@ -3,13 +3,27 @@ import { Link } from 'react-router'
 import { useToggleRecipeInFolder } from '../api/folders'
 import type { Folder } from '../api/types'
 import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
+import FolderIcon from './FolderIcon'
 
-const tileBase =
-  'group relative flex aspect-square flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl p-4 text-center transition duration-200'
+// Two tones, alternating by folder id: orange and green. (Full class names are written out
+// so Tailwind can see them at build time.)
+const TONES = [
+  {
+    tile: 'border-[#f3d1b8] bg-[#fdf1e8] hover:border-brand-600 dark:border-[#52301b] dark:bg-[#2a180d]',
+    icon: 'text-brand-600',
+  },
+  {
+    tile: 'border-herb-100 bg-herb-50 hover:border-herb-500',
+    icon: 'text-herb-500 dark:text-herb-700',
+  },
+]
+
+const tileBase = 'group relative flex flex-col items-center justify-center gap-0.5 overflow-hidden rounded-2xl p-5 text-center transition'
 
 // One folder as a square tile. The whole tile is a link that opens the folder page,
 // and also a drop target: drop a recipe card on it to add that recipe to the folder.
 export default function FolderTile({ folder }: { folder: Folder }) {
+  const tone = TONES[folder.id % TONES.length]
   const addRecipe = useToggleRecipeInFolder()
   const [dragOver, setDragOver] = useState(false)
   const [status, setStatus] = useState<'added' | 'error' | null>(null)
@@ -51,18 +65,19 @@ export default function FolderTile({ folder }: { folder: Folder }) {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragOver(false)
       }}
       onDrop={handleDrop}
-      className={`${tileBase} border shadow-sm hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-200/40 ${
+      className={`${tileBase} border ${
         dragOver
-          ? 'scale-105 border-herb-500 bg-herb-50 ring-2 ring-herb-500'
-          : 'border-brand-100 bg-surface hover:border-brand-200'
+          ? 'border-brand-600 bg-brand-50 ring-2 ring-brand-600/50 scale-[1.02]'
+          : `${tone.tile} hover:shadow-md`
       }`}
     >
-      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-herb-500 to-herb-100 transition-all duration-200 group-hover:h-1.5" />
-      <span aria-hidden className="text-5xl transition group-hover:scale-110 sm:text-6xl">📁</span>
-      <span dir="auto" className="line-clamp-2 text-base font-semibold leading-snug group-hover:text-brand-700">
+      <span className={`mb-2 grid size-11 place-items-center rounded-2xl bg-white/80 transition group-hover:scale-110 dark:bg-black/25 ${tone.icon}`}>
+        <FolderIcon className="size-5" />
+      </span>
+      <span dir="auto" className="line-clamp-2 text-sm font-bold leading-snug">
         {folder.name}
       </span>
-      <span role="status" className={`text-sm ${status === 'error' ? 'text-danger' : status ? 'font-medium text-herb-700' : 'text-ink/60'}`}>
+      <span role="status" className={`text-xs ${status === 'error' ? 'text-danger' : status ? 'font-medium text-brand-700' : 'text-ink/55'}`}>
         {status === 'added'
           ? '✓ המתכון נוסף'
           : status === 'error'
@@ -81,10 +96,11 @@ export function NewFolderTile({ onClick, disabled }: { onClick: () => void; disa
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${tileBase} border-2 border-dashed border-brand-200 text-brand-700 hover:bg-brand-50 disabled:opacity-60`}
+      className={`${tileBase} group border border-dashed border-brand-200 bg-surface/60 text-ink/60 hover:border-brand-600 hover:text-brand-600 disabled:opacity-60`}
     >
-      <span aria-hidden className="text-4xl">+</span>
-      <span className="font-medium">תיקייה חדשה</span>
+      <span aria-hidden className="mb-2 grid size-11 place-items-center rounded-2xl bg-brand-50 text-2xl leading-none transition">+</span>
+      <span className="text-sm font-semibold">תיקייה חדשה</span>
+      <span className="text-[11px] text-ink/45">ארגון לפי חג או קטגוריה</span>
     </button>
   )
 }

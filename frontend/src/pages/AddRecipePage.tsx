@@ -7,9 +7,9 @@ import RecipeForm, { inputClass, primaryButtonClass } from '../components/Recipe
 import { ErrorMessage } from '../components/StatusViews'
 
 const TABS = [
-  { id: 'link', icon: '🔗', label: 'מקישור' },
-  { id: 'photo', icon: '📷', label: 'מצילום' },
-  { id: 'manual', icon: '✍️', label: 'הקלדה' },
+  { id: 'link', label: 'מקישור' },
+  { id: 'photo', label: 'מצילום' },
+  { id: 'manual', label: 'הקלדה' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
 
@@ -24,29 +24,27 @@ export default function AddRecipePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">הוספת מתכון</h1>
+        <h1 className="text-3xl font-semibold">הוספת מתכון</h1>
         <p className="mt-1 text-ink/60">הדביקו קישור, צלמו דף מספר בישול או הקלידו בעצמכם.</p>
       </div>
 
-      <div role="tablist" className="flex gap-1 rounded-2xl bg-brand-50 p-1">
+      <div role="tablist" className="flex gap-1 border-b border-brand-100">
         {TABS.map((t) => (
           <button
             key={t.id}
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setSearchParams({ tab: t.id }, { replace: true })}
-            // Phone: icon above the label so each tab stays on one line. sm and up: side by side.
-            className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-sm font-medium transition sm:flex-row sm:justify-center sm:gap-2 sm:px-3 sm:py-2.5 ${
-              tab === t.id ? 'bg-surface text-brand-700 shadow-sm' : 'text-ink/60 hover:text-ink'
+            className={`-mb-px flex-1 border-b-2 px-3 py-2.5 text-sm font-medium transition sm:flex-none sm:px-5 ${
+              tab === t.id ? 'border-brand-600 text-ink' : 'border-transparent text-ink/55 hover:text-ink'
             }`}
           >
-            <span aria-hidden>{t.icon}</span>
-            <span>{t.label}</span>
+            {t.label}
           </button>
         ))}
       </div>
 
-      <div className="rounded-2xl border border-brand-100 bg-surface p-4 shadow-sm sm:p-6">
+      <div className="rounded-xl border border-brand-100 bg-surface p-4 sm:p-6">
         {tab === 'link' && <FromLink onSaved={openRecipe} />}
         {tab === 'photo' && <FromPhoto onSaved={openRecipe} />}
         {tab === 'manual' && <Manual onSaved={openRecipe} />}
@@ -105,10 +103,10 @@ function FromLink({ onSaved }: { onSaved: (r: Recipe) => void }) {
       {url && (
         <p className="text-sm text-ink/60">
           {youtube
-            ? '▶️ סרטון יוטיוב: המתכון נקרא מתיאור הסרטון, והתמלול משלים את מה שחסר. תמונת הסרטון נשמרת כתמונת המנה.'
+            ? 'סרטון יוטיוב: המתכון נקרא מתיאור הסרטון, והתמלול משלים את מה שחסר. תמונת הסרטון נשמרת כתמונת המנה.'
             : facebook
-            ? '📘 פייסבוק: המתכון נקרא מטקסט הפוסט (חייב להיות כתוב שם), ותמונת הסרטון נשמרת כתמונת המנה. פוסטים פרטיים לא נתמכים.'
-            : '🌐 אתר: הדף נקרא והמתכון מחולץ באמצעות בינה מלאכותית. אם יש בדף תמונה של המנה, היא נשמרת גם.'}
+            ? 'פייסבוק: המתכון נקרא מטקסט הפוסט (חייב להיות כתוב שם), ותמונת הסרטון נשמרת כתמונת המנה. פוסטים פרטיים לא נתמכים.'
+            : 'אתר: הדף נקרא והמתכון מחולץ באמצעות בינה מלאכותית. אם יש בדף תמונה של המנה, היא נשמרת גם.'}
         </p>
       )}
 
@@ -161,7 +159,7 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-8 text-center transition ${
+        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-8 text-center transition ${
           dragging ? 'border-brand-500 bg-brand-50' : 'border-brand-200 hover:bg-brand-50/50'
         }`}
       >
