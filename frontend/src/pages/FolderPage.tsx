@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useDeleteFolder, useFolders, useRenameFolder } from '../api/folders'
 import { useRecipes } from '../api/recipes'
+import FolderIcon from '../components/FolderIcon'
 import RecipeCard from '../components/RecipeCard'
 import { inputClass, secondaryButtonClass } from '../components/RecipeForm'
 import { EmptyState, ErrorMessage, Spinner } from '../components/StatusViews'
@@ -57,13 +58,13 @@ export default function FolderPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 rounded-3xl border border-brand-100 bg-surface p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <div className="flex flex-col gap-4 rounded-xl border border-brand-100 bg-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div className="space-y-2">
           <Link to="/" className="text-sm text-ink/60 hover:text-ink">
             <span className="inline-block rtl:rotate-180">←</span> כל המתכונים
           </Link>
-          <h1 dir="auto" className="flex items-center gap-3 text-3xl font-bold leading-tight">
-            <span aria-hidden>📁</span> {folder.name}
+          <h1 dir="auto" className="flex items-center gap-3 text-3xl font-semibold leading-tight">
+            <FolderIcon className="size-7 text-brand-600" /> {folder.name}
           </h1>
           <p className="text-ink/60">{inFolder.length === 1 ? 'מתכון אחד' : `${inFolder.length} מתכונים`}</p>
         </div>
@@ -72,7 +73,7 @@ export default function FolderPage() {
           <button
             onClick={handleDelete}
             disabled={deleteFolder.isPending}
-            className="rounded-xl border border-danger-line bg-surface px-5 py-2.5 pointer-coarse:py-3 font-medium text-danger transition hover:bg-danger-bg disabled:opacity-60"
+            className="rounded-lg border border-danger-line bg-surface px-5 py-2.5 pointer-coarse:py-3 text-sm font-medium text-danger transition hover:bg-danger-bg disabled:opacity-60"
           >
             מחיקה
           </button>
@@ -98,7 +99,7 @@ export default function FolderPage() {
       ) : filtered.length === 0 ? (
         <EmptyState title="לא נמצאו תוצאות">אין מתכון בתיקייה שמתאים ל־“{query}”.</EmptyState>
       ) : (
-        <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {filtered.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}

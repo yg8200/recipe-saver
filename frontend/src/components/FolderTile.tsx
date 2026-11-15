@@ -3,13 +3,26 @@ import { Link } from 'react-router'
 import { useToggleRecipeInFolder } from '../api/folders'
 import type { Folder } from '../api/types'
 import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
+import FolderIcon from './FolderIcon'
+
+// Each folder gets its own color, picked by its id, so the tiles are easy to tell apart.
+// (Full class names are written out so Tailwind can see them at build time.)
+const TONES = [
+  { tile: 'bg-brand-50 border-brand-200', icon: 'text-brand-600' },
+  { tile: 'bg-herb-50 border-herb-100', icon: 'text-herb-700' },
+  { tile: 'bg-sky-100 border-sky-200 dark:bg-sky-950 dark:border-sky-900', icon: 'text-sky-600 dark:text-sky-300' },
+  { tile: 'bg-violet-100 border-violet-200 dark:bg-violet-950 dark:border-violet-900', icon: 'text-violet-600 dark:text-violet-300' },
+  { tile: 'bg-rose-100 border-rose-200 dark:bg-rose-950 dark:border-rose-900', icon: 'text-rose-600 dark:text-rose-300' },
+  { tile: 'bg-amber-100 border-amber-200 dark:bg-amber-950 dark:border-amber-900', icon: 'text-amber-600 dark:text-amber-300' },
+]
 
 const tileBase =
-  'group relative flex aspect-square flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl p-4 text-center transition duration-200'
+  'group relative flex aspect-[4/3] flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl p-3 text-center transition'
 
 // One folder as a square tile. The whole tile is a link that opens the folder page,
 // and also a drop target: drop a recipe card on it to add that recipe to the folder.
 export default function FolderTile({ folder }: { folder: Folder }) {
+  const tone = TONES[folder.id % TONES.length]
   const addRecipe = useToggleRecipeInFolder()
   const [dragOver, setDragOver] = useState(false)
   const [status, setStatus] = useState<'added' | 'error' | null>(null)
@@ -51,18 +64,17 @@ export default function FolderTile({ folder }: { folder: Folder }) {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragOver(false)
       }}
       onDrop={handleDrop}
-      className={`${tileBase} border shadow-sm hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-200/40 ${
+      className={`${tileBase} border hover:border-brand-200 hover:shadow-md hover:shadow-black/5 ${
         dragOver
-          ? 'scale-105 border-herb-500 bg-herb-50 ring-2 ring-herb-500'
-          : 'border-brand-100 bg-surface hover:border-brand-200'
+          ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-500/40'
+          : `${tone.tile} hover:shadow-md`
       }`}
     >
-      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-herb-500 to-herb-100 transition-all duration-200 group-hover:h-1.5" />
-      <span aria-hidden className="text-5xl transition group-hover:scale-110 sm:text-6xl">📁</span>
-      <span dir="auto" className="line-clamp-2 text-base font-semibold leading-snug group-hover:text-brand-700">
+      <FolderIcon className={`size-9 ${tone.icon}`} />
+      <span dir="auto" className="line-clamp-2 text-sm font-semibold leading-snug">
         {folder.name}
       </span>
-      <span role="status" className={`text-sm ${status === 'error' ? 'text-danger' : status ? 'font-medium text-herb-700' : 'text-ink/60'}`}>
+      <span role="status" className={`text-xs ${status === 'error' ? 'text-danger' : status ? 'font-medium text-brand-700' : 'text-ink/55'}`}>
         {status === 'added'
           ? '✓ המתכון נוסף'
           : status === 'error'
@@ -81,10 +93,10 @@ export function NewFolderTile({ onClick, disabled }: { onClick: () => void; disa
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${tileBase} border-2 border-dashed border-brand-200 text-brand-700 hover:bg-brand-50 disabled:opacity-60`}
+      className={`${tileBase} border border-dashed border-brand-200 text-ink/60 hover:text-ink hover:border-brand-500 disabled:opacity-60`}
     >
-      <span aria-hidden className="text-4xl">+</span>
-      <span className="font-medium">תיקייה חדשה</span>
+      <span aria-hidden className="text-2xl leading-none">+</span>
+      <span className="text-sm font-medium">תיקייה חדשה</span>
     </button>
   )
 }

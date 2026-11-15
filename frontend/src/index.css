@@ -7,50 +7,52 @@
 @theme {
   --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif;
 
-  /* Warm tomato/coral brand color. Used for actions, links and highlights. */
-  --color-brand-50: #efd9bf;
-  --color-brand-100: #dcc3a3;
-  --color-brand-200: #d9a47a;
+  /*
+    A warm palette: sand surfaces, a tomato-orange accent and a herb-green second color.
+    The names brand-50..700 are kept so components do not change: 50/100/200 are neutral tints
+    (hover backgrounds, borders), 500-700 are the accent.
+  */
+  --color-brand-50: #f6dfc8;
+  --color-brand-100: #e6cfb2;
+  --color-brand-200: #d9b48a;
   --color-brand-500: #ee6a35;
   --color-brand-600: #cf4a17;
   --color-brand-700: #a8380f;
-  --color-brand-hover: #b53d10; /* hover color for solid brand buttons */
+  --color-brand-hover: #b53d10;
 
-  /* Fresh herb green as a friendly second accent (ingredients, time/servings badges) */
-  --color-herb-50: #d6e3c6;
-  --color-herb-100: #c2d6b0;
+  /* Muted secondary tints (used for small badges) */
+  --color-herb-50: #dbe7d0;
+  --color-herb-100: #c4d9b4;
   --color-herb-500: #5a9a5f;
   --color-herb-700: #2f6139;
 
-  /* Page, card and text colors. The light theme is deliberately soft (no near-white surfaces) to be easy on the eyes. */
-  --color-cream: #e6d9c3;
-  --color-surface: #f1e6d2;
-  --color-ink: #2f241e;
+  /* Page, card and text colors: soft, low-glare grays (no near-white surfaces) */
+  --color-cream: #efe2cc;
+  --color-surface: #f9f1e1;
+  --color-ink: #2a211c;
 
   /* Rating stars */
-  --color-star: #d08a00;
+  --color-star: #b7791f;
+
+  /* Banner on the home page */
+  --color-hero-from: #c2410c;
+  --color-hero-to: #f59e0b;
 
   /* Errors and destructive actions */
   --color-danger: #b42318;
-  --color-danger-bg: #efd0c4;
-  --color-danger-line: #deab9d;
-
-  /* Header banner on the home page */
-  --color-hero-from: #c2410c;
-  --color-hero-to: #ea580c;
+  --color-danger-bg: #efd5cf;
+  --color-danger-line: #deb0a6;
 }
 
 /*
   Dark mode. Every color above is a CSS variable, so switching themes just means
   redefining the same variables under .dark (set on <html> by the theme toggle).
-  No component needs a separate dark: class. Dark surfaces are warm browns, not pure
-  black, and the brand-700 text color becomes a light peach so it stays readable.
 */
 .dark {
   color-scheme: dark;
 
-  --color-brand-50: #2e1d15;
-  --color-brand-100: #43281b;
+  --color-brand-50: #33211a;
+  --color-brand-100: #46291d;
   --color-brand-200: #7a4228;
   --color-brand-500: #ff8f63;
   --color-brand-600: #d9531f;
@@ -62,27 +64,31 @@
   --color-herb-500: #6fbf7b;
   --color-herb-700: #9bd8a4;
 
-  --color-cream: #181311;
-  --color-surface: #231c18;
+  --color-cream: #1a1411;
+  --color-surface: #261d18;
   --color-ink: #f5ede7;
-  --color-star: #f5b942;
+  --color-star: #e0a73a;
+
+  --color-hero-from: #a63a14;
+  --color-hero-to: #d9831f;
 
   --color-danger: #ffb4ab;
   --color-danger-bg: #3a1717;
   --color-danger-line: #7a2b2b;
-
-  --color-hero-from: #a63a14;
-  --color-hero-to: #d9531f;
 }
 
 /* Lets Tailwind's dark: variant work too, driven by the same .dark class */
 @custom-variant dark (&:where(.dark, .dark *));
 
 body {
-  /* A soft warm glow at the top gives the page depth without adding noise */
   @apply bg-cream text-ink antialiased;
-  background-image: radial-gradient(60rem 28rem at 50% -8rem, var(--color-brand-100), transparent 70%);
+  /* A faint warm glow at the top of the page */
+  background-image: radial-gradient(60rem 26rem at 50% -10rem, var(--color-brand-100), transparent 70%);
   background-repeat: no-repeat;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.015em;
 }
 
 /* A long unbroken word or URL wraps instead of pushing the page wider than the screen */

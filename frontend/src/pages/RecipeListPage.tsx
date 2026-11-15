@@ -26,26 +26,36 @@ export default function RecipeListPage() {
   if (error) return <ErrorMessage error={error} onRetry={() => refetch()} />
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-5 rounded-3xl bg-gradient-to-bl from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-200/60 sm:flex-row sm:items-end sm:justify-between sm:p-10">
-        <div>
-          <h1 className="text-3xl font-bold sm:text-4xl">המתכונים שלי</h1>
-          <p className="mt-1 text-white/90">
-            {recipes.length === 1 ? 'מתכון אחד שמור' : `${recipes.length} מתכונים שמורים`} · מה מבשלים היום?
-          </p>
+    <div className="space-y-10">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-hero-from to-hero-to p-6 text-white shadow-lg shadow-brand-500/20 sm:p-8">
+        {/* Decorative circles, purely visual */}
+        <span aria-hidden className="pointer-events-none absolute -start-10 -top-16 size-56 rounded-full bg-white/10" />
+        <span aria-hidden className="pointer-events-none absolute -bottom-20 start-1/3 size-48 rounded-full bg-white/10" />
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold sm:text-4xl">המתכונים שלי</h1>
+            <p className="mt-1 text-white/85">
+              {recipes.length === 1 ? 'מתכון אחד שמור' : `${recipes.length} מתכונים שמורים`} · מה מבשלים היום?
+            </p>
+          </div>
+          {recipes.length > 0 && (
+            <label className="relative block sm:w-80">
+              <svg aria-hidden viewBox="0 0 24 24" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink/50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+              </svg>
+              <input
+                type="search"
+                dir="auto"
+                value={query}
+                onChange={(e) => setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true })}
+                placeholder="חיפוש לפי שם או מצרך…"
+                aria-label="חיפוש מתכונים"
+                className={`${inputClass} border-transparent text-ink ps-9`}
+              />
+            </label>
+          )}
         </div>
-        {recipes.length > 0 && (
-          <input
-            type="search"
-            dir="auto"
-            value={query}
-            onChange={(e) => setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true })}
-            placeholder="חיפוש לפי שם או מצרך…"
-            aria-label="חיפוש מתכונים"
-            className={`${inputClass} border-transparent text-ink sm:max-w-xs`}
-          />
-        )}
-      </div>
+      </section>
 
       {recipes.length > 0 && <FolderGrid />}
 
@@ -60,8 +70,8 @@ export default function RecipeListPage() {
         <EmptyState title="לא נמצאו תוצאות">אין מתכון שמתאים ל־“{query}”.</EmptyState>
       ) : (
         <section className="space-y-4" aria-labelledby="recipes-heading">
-          <h2 id="recipes-heading" className="text-xl font-semibold">כל המתכונים</h2>
-          <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <h2 id="recipes-heading" className="text-lg font-semibold">כל המתכונים</h2>
+          <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {filtered.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}

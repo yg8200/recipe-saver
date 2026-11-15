@@ -3,13 +3,20 @@ import type { Recipe } from '../api/types'
 import { textDirection } from '../utils/textDirection'
 import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
 import { imageSrc } from '../utils/imageUrl'
-import RecipeMeta from './RecipeMeta'
-import StarRating from './StarRating'
+
+// A small dark label that sits on top of the photo (time, rating)
+const chipClass = 'flex items-center gap-1.5 rounded-lg bg-black/55 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm'
 
 // One recipe in the grid on the home page. The whole card is a link to the recipe page.
 export default function RecipeCard({ recipe }: { recipe: Recipe }) {
-  // Section headers like "--- לשכבת השקדים ---" aren't real ingredients, so skip them in the preview
-  const preview = recipe.ingredients.filter((line) => !line.startsWith('---')).slice(0, 3)
+  // Section headers like "--- לשכבת השקדים ---" aren't real ingredients, so skip them
+  const ingredients = recipe.ingredients.filter((line) => !line.startsWith('---'))
+  const totalMinutes = (recipe.prep_time_minutes ?? 0) + (recipe.cook_time_minutes ?? 0)
+
+  const facts = [
+    recipe.servings != null && (recipe.servings === 1 ? 'מנה אחת' : `${recipe.servings} מנות`),
+    `${ingredients.length} מצרכים`,
+  ].filter((fact): fact is string => fact !== false)
 
   return (
     <Link
@@ -22,35 +29,55 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
         e.dataTransfer.effectAllowed = 'copy'
       }}
       dir={textDirection(recipe.title)}
-      className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-brand-100 bg-surface p-6 pt-7 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg hover:shadow-brand-200/40"
+      className="group flex flex-col overflow-hidden rounded-3xl border border-brand-100 bg-surface transition duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-xl hover:shadow-brand-500/15"
     >
-      {/* Accent bar along the top edge; it grows on hover. */}
-      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 to-brand-200 transition-all duration-200 group-hover:h-1.5" />
-      {recipe.image_url && (
-        // Negative margins cancel the card's padding so the photo runs edge to edge
-        <img
-          src={imageSrc(recipe.image_url)!}
-          alt=""
-          loading="lazy"
-          className="-mx-6 -mt-7 mb-1 aspect-[4/3] w-[calc(100%+3rem)] max-w-none object-cover"
-        />
-      )}
-      {/* The card's dir (set from the title) mirrors the whole card for Hebrew recipes */}
-      <h2 className="text-lg font-semibold leading-snug group-hover:text-brand-700">
-        {recipe.title}
-      </h2>
+      {/* Photo with the time and rating on top of it. Without a photo, a neutral block keeps the grid even. */}
+      <div className="relative aspect-[16/10] overflow-hidden bg-brand-50">
+        {recipe.image_url && (
+          <img
+            src={imageSrc(recipe.image_url)!}
+            alt=""
+            loading="lazy"
+            className="size-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        )}
+        <span aria-hidden className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/50 to-transparent" />
 
-      {recipe.rating !== null && <StarRating value={recipe.rating} />}
+        <div className="absolute inset-x-3.5 bottom-3 flex items-center justify-between">
+          {totalMinutes > 0 ? (
+            <span className={chipClass}>
+              <svg aria-hidden viewBox="0 0 24 24" className="size-3.5 text-brand-500" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+              </svg>
+              {totalMinutes} דק׳
+            </span>
+          ) : <span />}
+          {recipe.rating !== null && (
+            <span className={chipClass} role="img" aria-label={`דירוג ${recipe.rating} מתוך 5`}>
+              <svg aria-hidden viewBox="0 0 24 24" className="size-3.5 text-amber-400" fill="currentColor">
+                <path d="M12 3.2l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.2l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" />
+              </svg>
+              {recipe.rating}
+            </span>
+          )}
+        </div>
+      </div>
 
-      <ul dir="auto" className="space-y-0.5 text-sm text-ink/60">
-        {preview.map((line, i) => (
-          <li key={i} className="truncate before:me-2 before:text-brand-500 before:content-['•']">{line}</li>
-        ))}
-        {recipe.ingredients.length > preview.length && <li>…</li>}
-      </ul>
-
-      <div className="mt-auto">
-        <RecipeMeta recipe={recipe} />
+      <div className="flex flex-1 flex-col gap-2 p-5">
+        {/* The card's dir (set from the title) mirrors the whole card for Hebrew recipes */}
+        <p className="flex items-center gap-2 text-xs font-semibold tracking-wide text-herb-700">
+          {facts.map((fact, i) => (
+            <span key={fact} className="flex items-center gap-2">
+              {i > 0 && <span aria-hidden>•</span>}
+              {fact}
+            </span>
+          ))}
+        </p>
+        <h2 className="line-clamp-2 text-lg font-bold leading-snug transition group-hover:text-brand-700">{recipe.title}</h2>
+        {/* We have no separate description, so the first ingredients act as the teaser */}
+        <p dir="auto" className="line-clamp-2 text-sm leading-relaxed text-ink/60">
+          {ingredients.slice(0, 4).join(' · ')}
+        </p>
       </div>
     </Link>
   )

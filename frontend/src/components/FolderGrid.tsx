@@ -18,8 +18,8 @@ export default function FolderGrid() {
 
   return (
     <section className="space-y-4" aria-labelledby="folders-heading">
-      <h2 id="folders-heading" className="text-xl font-semibold">תיקיות</h2>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 2xl:grid-cols-6">
+      <h2 id="folders-heading" className="text-lg font-semibold">תיקיות</h2>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6">
         {folders.map((folder) => (
           <FolderTile key={folder.id} folder={folder} />
         ))}

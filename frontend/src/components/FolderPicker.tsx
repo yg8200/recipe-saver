@@ -1,3 +1,4 @@
+import FolderIcon from './FolderIcon'
 import { useCreateFolder, useFolders, useToggleRecipeInFolder } from '../api/folders'
 import type { Recipe } from '../api/types'
 import { chipClass } from '../utils/chipClass'
@@ -21,8 +22,8 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
   const failure = toggle.error ?? createFolder.error
 
   return (
-    <section className="space-y-3 rounded-2xl border border-brand-100 bg-surface p-6 shadow-sm">
-      <h2 className="text-lg font-semibold">תיקיות</h2>
+    <section className="space-y-3 rounded-xl border border-brand-100 bg-surface p-6 shadow-sm">
+      <h2 className="text-sm font-semibold text-ink/60">תיקיות</h2>
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label="תיקיות של המתכון">
         {folders.map((folder) => {
           const inFolder = recipe.folder_ids.includes(folder.id)
@@ -35,7 +36,7 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
               onClick={() => toggle.mutate({ folderId: folder.id, recipeId: recipe.id, inFolder })}
               className={`${chipClass(inFolder)} disabled:opacity-60`}
             >
-              {inFolder ? '✓ ' : '📁 '}
+              {inFolder ? '✓ ' : <FolderIcon className="me-1.5 inline size-4 align-[-3px]" />}
               {folder.name}
             </button>
           )
@@ -43,7 +44,7 @@ export default function FolderPicker({ recipe }: { recipe: Recipe }) {
         <button
           onClick={handleCreate}
           disabled={createFolder.isPending}
-          className="rounded-full border border-dashed border-brand-200 px-4 py-1.5 pointer-coarse:py-2.5 text-sm font-medium text-brand-700 transition hover:bg-brand-50 disabled:opacity-60"
+          className="rounded-lg border border-dashed border-brand-200 px-3.5 py-1.5 pointer-coarse:py-2.5 text-sm font-medium text-brand-700 transition hover:bg-brand-50 disabled:opacity-60"
         >
           + תיקייה חדשה
         </button>
