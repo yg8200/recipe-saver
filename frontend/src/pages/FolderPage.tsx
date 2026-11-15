@@ -1,8 +1,9 @@
-import { Link, useNavigate, useParams } from 'react-router'
+import { useMemo } from 'react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useDeleteFolder, useFolders, useRenameFolder } from '../api/folders'
 import { useRecipes } from '../api/recipes'
 import RecipeCard from '../components/RecipeCard'
-import { secondaryButtonClass } from '../components/RecipeForm'
+import { inputClass, secondaryButtonClass } from '../components/RecipeForm'
 import { EmptyState, ErrorMessage, Spinner } from '../components/StatusViews'
 import NotFoundPage from './NotFoundPage'
 
@@ -15,6 +16,24 @@ export default function FolderPage() {
   const renameFolder = useRenameFolder()
   const deleteFolder = useDeleteFolder()
 
+  // Same idea as the home page: the search text lives in the URL (?q=...)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const query = searchParams.get('q') ?? ''
+  // The folder->recipes link lives on each recipe (folder_ids), so we just filter the cached list.
+  // Hooks must run before the early returns below, hence useMemo up here.
+  const inFolder = useMemo(
+    () => (recipeList ?? []).filter((r) => r.folder_ids.includes(id)),
+    [recipeList, id],
+  )
+  // Search only inside this folder: filter the folder's recipes, not all recipes
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return inFolder
+    return inFolder.filter(
+      (r) => r.title.toLowerCase().includes(q) || r.ingredients.some((i) => i.toLowerCase().includes(q)),
+    )
+  }, [inFolder, query])
+
   const loadError = foldersError ?? recipesError
   if (loadError) return <ErrorMessage error={loadError} onRetry={() => { refetchFolders(); refetchRecipes() }} />
   // Checking the data itself (not just isPending) also tells TypeScript it is defined below
@@ -22,9 +41,6 @@ export default function FolderPage() {
 
   const folder = folderList.find((f) => f.id === id)
   if (!folder) return <NotFoundPage />
-
-  // The folder->recipes link lives on each recipe (folder_ids), so we just filter the cached list
-  const inFolder = recipeList.filter((r) => r.folder_ids.includes(id))
 
   function handleRename() {
     const name = window.prompt('שם חדש לתיקייה', folder!.name)?.trim()
@@ -65,11 +81,25 @@ export default function FolderPage() {
 
       {failure && <ErrorMessage error={failure} />}
 
+      {inFolder.length > 0 && (
+        <input
+          type="search"
+          dir="auto"
+          value={query}
+          onChange={(e) => setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true })}
+          placeholder="חיפוש בתיקייה לפי שם או מצרך…"
+          aria-label="חיפוש בתיקייה"
+          className={`${inputClass} sm:max-w-xs`}
+        />
+      )}
+
       {inFolder.length === 0 ? (
         <EmptyState title="התיקייה ריקה">פתחו מתכון ובחרו את התיקייה הזו כדי להוסיף אותו לכאן.</EmptyState>
+      ) : filtered.length === 0 ? (
+        <EmptyState title="לא נמצאו תוצאות">אין מתכון בתיקייה שמתאים ל־“{query}”.</EmptyState>
       ) : (
         <div className="grid gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {inFolder.map((recipe) => (
+          {filtered.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}
         </div>
