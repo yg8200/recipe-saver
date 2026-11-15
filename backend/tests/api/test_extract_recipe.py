@@ -176,9 +176,9 @@ def test_extract_trims_url_before_scraping(client):
     scraper.assert_called_once_with("https://example.com/cake")
 
 
-# Extracting a recipe whose title already exists (case-insensitive) returns 409.
+# A different link that gives an already-used title returns 409 (the unique title column still protects us).
 def test_extract_duplicate_title_returns_409(client):
-    client.post("/recipes", json={"title": "web cake", "ingredients": ["a"], "instructions": ["b"]})
+    client.post("/recipes", json={"title": "Web Cake", "ingredients": ["a"], "instructions": ["b"]})
 
     with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page", None)), \
          patch("src.api.extract_recipe.extract_recipe_from_text", return_value=WEB_RECIPE):
@@ -305,15 +305,28 @@ def test_extract_youtube_uses_thumbnail(client, jpeg_bytes, monkeypatch):
     assert "/vi/abc123/" in tried[0]
 
 
-# A duplicate recipe is rejected before any photo is downloaded.
+# A link that was already saved is rejected before any photo is downloaded.
 def test_extract_duplicate_does_not_download_image(client):
-    client.post("/recipes", json={"title": "Pie", "ingredients": ["a"], "instructions": ["b"]})
     scrape, extract = _web_recipe("https://cdn.example.com/pie.jpg")
+    with scrape, extract:
+        client.post("/recipes/extract", json={"url": "https://example.com/pie"})
     with scrape, extract, patch("src.api.extract_recipe.fetch_and_store_image") as fetch:
         response = client.post("/recipes/extract", json={"url": "https://example.com/pie"})
 
     assert response.status_code == 409
     fetch.assert_not_called()
+
+
+# A title clash from a different link removes the photo that was already downloaded.
+def test_extract_duplicate_title_removes_downloaded_image(client, app, jpeg_bytes, monkeypatch):
+    client.post("/recipes", json={"title": "Pie", "ingredients": ["a"], "instructions": ["b"]})
+    monkeypatch.setattr("src.services.recipe_image.download_image", lambda url: jpeg_bytes)
+    scrape, extract = _web_recipe("https://cdn.example.com/pie.jpg")
+    with scrape, extract:
+        response = client.post("/recipes/extract", json={"url": "https://example.com/pie"})
+
+    assert response.status_code == 409
+    assert _uploaded(app) == []
 
 
 # If saving the recipe fails after the photo was stored, the photo file is removed again.
@@ -328,3 +341,33 @@ def test_extract_failure_after_image_cleans_up_file(client, app, jpeg_bytes, mon
 
     assert response.status_code == status
     assert _uploaded(app) == []
+
+
+# Extracting from a URL saves that URL on the recipe as source_url.
+def test_extract_saves_source_url(client):
+    model = RecipeExtracted(title="Web Cake", ingredients=["sugar"], instructions=["bake"])
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page text", None)), \
+         patch("src.api.extract_recipe.extract_recipe_from_text", return_value=model):
+        response = client.post("/recipes/extract", json={"url": "https://example.com/cake"})
+    assert response.status_code == 201
+    assert response.get_json()["source_url"] == "https://example.com/cake"
+
+
+# Extracting the same URL twice is rejected (409) before the AI is called a second time.
+def test_extract_same_url_twice_returns_409_without_calling_ai(client):
+    first = RecipeExtracted(title="Web Cake", ingredients=["sugar"], instructions=["bake"])
+    second = RecipeExtracted(title="Sneaky Cake Copy", ingredients=["sugar"], instructions=["bake"])
+    url = "https://example.com/cake"
+
+    with patch("src.api.extract_recipe.scrape_recipe", return_value=ScrapedPage("page text", None)), \
+         patch("src.api.extract_recipe.extract_recipe_from_text", return_value=first) as mock_ai:
+        first_response = client.post("/recipes/extract", json={"url": url})
+        assert first_response.status_code == 201
+        first_id = first_response.get_json()["id"]
+
+        mock_ai.return_value = second  # the AI would now give a different title
+        second_response = client.post("/recipes/extract", json={"url": url})
+
+    assert second_response.status_code == 409
+    assert second_response.get_json()["existing_recipe_id"] == first_id  # lets the UI link to the saved recipe
+    mock_ai.assert_called_once()  # the AI ran only for the first request

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from pydantic import BaseModel
-from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from src.core.database import db
 from src.models.recipe import Recipe
 
@@ -75,6 +75,15 @@ def extract_recipe():
     image_filename = None  # set once a photo is stored; cleaned up again if saving the recipe fails
 
     try:
+        # Same link already saved? Stop here, before any download or paid AI call.
+        existing = Recipe.query.filter_by(source_url=url).first()
+        if existing:
+            # existing_recipe_id lets the frontend link straight to the saved recipe
+            return jsonify({
+                "error": f"A recipe from this link already exists (ID: {existing.id}).",
+                "existing_recipe_id": existing.id,
+            }), 409
+
         # Route to the correct extraction service
         if is_youtube_url(url):
             # The YouTube extractor now handles description vs transcript logic internally
@@ -94,30 +103,22 @@ def extract_recipe():
         # Apply the guardrail to ensure the AI actually found valid lists
         validated_data = validate_extracted_recipe(raw_extracted)
 
-        # Check for duplicates
-        existing = (
-            db.session.query(Recipe)
-            .filter(func.lower(Recipe.title) == validated_data["title"].lower())
-            .first()
-        )
-        
-        if existing:
-            return jsonify({
-                "error": f"A recipe with the title '{validated_data['title']}' already exists (ID: {existing.id})."
-            }), 409
-
         # Best effort: a missing or broken photo never stops the recipe from being saved.
-        # Done after the duplicate check so we don't download a photo for a recipe we reject.
         image_filename = fetch_and_store_image(image_candidates)
 
         # Save to database
-        new_recipe = Recipe(**validated_data, image_filename=image_filename)
+        new_recipe = Recipe(**validated_data, source_url=url, image_filename=image_filename)
 
         db.session.add(new_recipe)
         db.session.commit()
 
         return jsonify(new_recipe.to_dict()), 201
 
+    except IntegrityError:
+        # Two different links gave the same title (the title column is unique)
+        db.session.rollback()
+        delete_recipe_image(image_filename)
+        return jsonify({"error": f"A recipe with the title '{validated_data['title']}' already exists."}), 409
     except ValueError as ve:
         db.session.rollback()
         delete_recipe_image(image_filename)

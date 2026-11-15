@@ -6,11 +6,14 @@ import { translateError } from './errors'
 
 export class ApiError extends Error {
   readonly status: number
+  // Set when the link was already extracted: the id of the recipe that was saved from it
+  readonly existingRecipeId?: number
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, existingRecipeId?: number) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.existingRecipeId = existingRecipeId
   }
 }
 
@@ -28,7 +31,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
 
   if (!response.ok) {
     const message = body?.error ?? `Request failed with status ${response.status}`
-    throw new ApiError(response.status, translateError(response.status, message))
+    throw new ApiError(response.status, translateError(response.status, message), body?.existing_recipe_id)
   }
   return body as T
 }
