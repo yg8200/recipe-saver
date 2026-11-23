@@ -138,8 +138,7 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
   const [dragging, setDragging] = useState(false)
   const extract = useExtractFromImage()
 
-  // Free the last preview URL when the user leaves this tab or page.
-  // This effect syncs with an external system (the browser's blob memory), which is what effects are for.
+  // Free the last preview URL (browser memory) when the user leaves this tab or page
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
   }, [previewUrl])
@@ -148,9 +147,7 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
     const chosen = files?.[0]
     if (!chosen) return
     setFile(chosen)
-    // A temporary local URL lets <img> show the file before it is uploaded. Created here, in the
-    // event that picked the file, rather than in an effect reacting to `file` changing.
-    // HEIC can't be previewed by most browsers, so for those we show the file name instead.
+    // HEIC can't be previewed by most browsers, so for those we show the file name instead
     setPreviewUrl(/\.(heic|heif)$/i.test(chosen.name) ? null : URL.createObjectURL(chosen))
     extract.reset() // clear an error from a previous attempt
   }
@@ -160,7 +157,6 @@ function FromPhoto({ onSaved }: { onSaved: (r: Recipe) => void }) {
     setDragging(false)
     choose(e.dataTransfer.files)
   }
-
 
   return (
     <div className="space-y-4">
@@ -258,8 +254,7 @@ function Manual({ onSaved }: { onSaved: (r: Recipe) => void }) {
 
 // ---------------------------------------------------------------------------
 
-// Shown only while a request runs. Because it is mounted fresh for every request, its
-// counter starts at 0 each time without any reset logic; the interval is cleared on unmount.
+// Mounted fresh per request, so the counter needs no reset
 function Working({ message }: { message: (seconds: number) => string }) {
   const [seconds, setSeconds] = useState(0)
 

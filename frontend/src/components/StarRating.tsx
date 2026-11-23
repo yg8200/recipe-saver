@@ -2,8 +2,6 @@ import { useState } from 'react'
 
 const STARS = [1, 2, 3, 4, 5]
 
-// A single star drawn as SVG: outline only when empty, filled when "on".
-// currentColor lets the parent pick the color (text-star), so it follows the theme.
 function Star({ filled, className }: { filled: boolean; className: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round">

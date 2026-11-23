@@ -8,11 +8,9 @@ from src.services.ai_client import get_gemini_client, get_gemini_model, get_gemi
 
 
 def extract_recipe_from_image(image_bytes: bytes, mime_type: str) -> dict:
-    # 1. Pass the raw bytes to your new compression module
-    # We no longer need the mime_type check because the module forces everything to JPEG
+    # Always a resized JPEG, whatever the input format
     optimized_image_bytes = process_and_compress_image(image_bytes)
-    
-    # 2. Load the optimized image for Gemini
+
     pil_image = Image.open(io.BytesIO(optimized_image_bytes))
     client = get_gemini_client()
     

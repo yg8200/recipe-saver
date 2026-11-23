@@ -8,20 +8,18 @@ add_recipe_bp = Blueprint("add_recipe", __name__)
 
 @add_recipe_bp.post("/recipes")
 def add_recipe():
-    # Use silent=True to avoid Flask's automatic 415 error on bad content-types
+    # silent=True: return our own 400 instead of Flask's 415
     data = request.get_json(silent=True)
     
     if not data or not isinstance(data, dict):
         return jsonify({"error": "Request body must be a valid JSON object"}), 400
 
     title = data.get("title")
-    # Check if title exists, is a string, and isn't just empty spaces
     if not isinstance(title, str) or not title.strip():
         return jsonify({"error": "'title' is required"}), 400
     
     title = title.strip()
 
-    # Check if a recipe with this title already exists (case-insensitive)
     existing = (
         db.session.query(Recipe)
         .filter(func.lower(Recipe.title) == title.lower())
@@ -34,17 +32,16 @@ def add_recipe():
         )
 
     ingredients = data.get("ingredients")
-    # Ensure ingredients is a list and has at least one item
     if not isinstance(ingredients, list) or len(ingredients) == 0:
         return jsonify({"error": "'ingredients' is required"}), 400
 
     instructions = data.get("instructions")
-    # Ensure instructions is a list and has at least one item
     if not isinstance(instructions, list) or len(instructions) == 0:
         return jsonify({"error": "'instructions' is required"}), 400
 
     for field in ["prep_time_minutes", "cook_time_minutes", "servings"]:
         val = data.get(field)
+        # bool is a subclass of int
         if val is not None and (not isinstance(val, int) or isinstance(val, bool) or val < 0):
             return jsonify({"error": f"'{field}' must be a non-negative integer or null"}), 400
 

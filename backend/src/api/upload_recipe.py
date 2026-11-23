@@ -22,11 +22,10 @@ def upload_recipe_image():
         return jsonify({"error": "Empty file name"}), 400
 
     try:
-        # Read the image data
         image_bytes = file.read()
         mime_type = file.mimetype
-        
-        # Fallback to detect HEIC from the filename
+
+        # Browsers often don't report a HEIC mimetype
         if file.filename and file.filename.lower().endswith(('.heic', '.heif')):
             mime_type = 'image/heic'
         elif not mime_type:
@@ -35,9 +34,7 @@ def upload_recipe_image():
         # 1. Read the text from the image (Gemini)
         raw_extracted_data = extract_recipe_from_image(image_bytes, mime_type)
 
-        # 2. AI guardrail: fix OCR typos with the configured corrector model
-        # If the corrector fails (API error, bad JSON, wrong shape), fall back to the raw OCR result
-        # instead of failing the whole upload.
+        # 2. Fix OCR typos. If that fails, keep the raw OCR text rather than fail the upload
         try:
             corrected_data = correct_recipe_text(raw_extracted_data)
             if not isinstance(corrected_data, dict):
@@ -50,7 +47,6 @@ def upload_recipe_image():
         # 3. Deterministic guardrail: make sure the output is valid before it reaches the DB
         validated_data = validate_extracted_recipe(corrected_data)
 
-        # Reject duplicates (same title, case-insensitive)
         existing = (
             db.session.query(Recipe)
             .filter(func.lower(Recipe.title) == validated_data["title"].lower())
@@ -61,7 +57,6 @@ def upload_recipe_image():
                 "error": f"A recipe with the title '{validated_data['title']}' already exists."
             }), 409
 
-        # Save to the database
         new_recipe = Recipe(
             title=validated_data["title"],
             ingredients=validated_data["ingredients"],

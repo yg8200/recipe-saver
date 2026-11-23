@@ -1,15 +1,12 @@
 import { useState } from 'react'
 
-// Saved marks are forgotten this long after the LAST change (tick or untick). Cooking a meal
-// takes hours at most, so next week's visit to the same recipe starts clean.
+// Forget ticks a while after the last change, so next week starts clean
 const EXPIRES_AFTER_MS = 6 * 60 * 60 * 1000
 
 const onlyNumbers = (value: unknown): Set<number> =>
   new Set(Array.isArray(value) ? value.filter((n): n is number => typeof n === 'number') : [])
 
-// Reads a saved set of numbers from localStorage. Storage can be missing or blocked
-// (private window, blocked site data), so every access is wrapped and falls back to "empty".
-// Saved format: { items: number[], savedAt: <ms timestamp> }.
+// Format: { items: number[], savedAt: ms }. Storage may be blocked, so fall back to empty
 function load(key: string): Set<number> {
   try {
     const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? 'null')
@@ -33,9 +30,7 @@ export function clearStoredSet(key: string) {
   }
 }
 
-// Like useState<Set<number>>, but the value is also saved in the browser under `key`,
-// so it is still there after leaving the page, refreshing, or closing the tab
-// (until it expires, see EXPIRES_AFTER_MS).
+// useState<Set<number>> that is also saved in localStorage under `key`
 export function useStoredSet(key: string): [Set<number>, (next: Set<number>) => void] {
   const [state, setState] = useState(() => ({ key, set: load(key) }))
 

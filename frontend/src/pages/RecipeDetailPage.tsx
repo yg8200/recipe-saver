@@ -12,11 +12,10 @@ import NotFoundPage from './NotFoundPage'
 // Section header lines look like "--- לשכבת השקדים ---"; strip the dashes for display
 const HEADER = /^-{2,}\s*(.*?)\s*-{2,}$/
 const headerText = (line: string) => line.match(HEADER)?.[1] ?? null
-// Photo recipes already carry their own "4." prefix. We draw our own number badge instead,
-// so strip the prefix to avoid showing the number twice.
 // Number of real steps up to and including index i (section headers don't count)
 const stepNumber = (lines: string[], i: number) =>
   lines.slice(0, i + 1).filter((l) => headerText(l) === null).length
+// Photo recipes have their own "4." prefix; we draw a badge instead
 const stripStepNumber = (line: string) => line.replace(/^\s*\d+\s*[.)]\s*/, '')
 
 const Check = () => (
@@ -41,13 +40,12 @@ const UsersIcon = () => (
 )
 
 export default function RecipeDetailPage() {
-  const id = Number(useParams().id) // URL params are always strings
+  const id = Number(useParams().id)
   const { data: recipe, isPending, error, refetch } = useRecipe(id)
   const deleteRecipe = useDeleteRecipe()
   const updateRecipe = useUpdateRecipe(id)
   const navigate = useNavigate()
-  // Cooking helpers: tick off what you have, mark steps as done. They are saved in this browser
-  // (per recipe), so they are still there when you come back. Indexes are positions in the lists.
+  // Ticks are kept per recipe in localStorage
   const ingredientsKey = `recipe-${id}-ingredients`
   const stepsKey = `recipe-${id}-steps`
   const [haveIngredients, setHaveIngredients] = useStoredSet(ingredientsKey)

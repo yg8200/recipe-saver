@@ -1,6 +1,4 @@
-// A thin wrapper around fetch() that every API call goes through.
-// It adds the /api prefix (see the proxy in vite.config.ts) and turns
-// the backend's {"error": "..."} responses into a typed ApiError with a Hebrew message.
+// fetch() wrapper: adds the /api prefix and turns {"error": ...} into an ApiError
 
 import { translateError } from './errors'
 

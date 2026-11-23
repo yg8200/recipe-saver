@@ -2,10 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiRequest, jsonBody } from './client'
 import type { Recipe, RecipeInput, RecipeUpdate } from './types'
 
-// ---------------------------------------------------------------------------
-// Plain API functions: one per backend endpoint. They know nothing about React.
-// ---------------------------------------------------------------------------
-
 export const recipesApi = {
   list: () => apiRequest<Recipe[]>('/recipes'),
 
@@ -31,24 +27,13 @@ export const recipesApi = {
   extractFromUrl: (url: string) =>
     apiRequest<Recipe>('/recipes/extract', { method: 'POST', ...jsonBody({ url }) }),
 
-  // Photo upload uses multipart/form-data. We pass a FormData object and do NOT set
-  // Content-Type ourselves: the browser adds it, including the required "boundary".
+  // Don't set Content-Type: the browser adds it with the multipart boundary
   extractFromImage: (file: File) => {
     const form = new FormData()
     form.append('image', file)
     return apiRequest<Recipe>('/recipes/upload', { method: 'POST', body: form })
   },
 }
-
-// ---------------------------------------------------------------------------
-// React hooks built on TanStack Query.
-//
-// useQuery   = reading data. It caches results under a "query key", tracks loading/error
-//              state, and refetches when needed. Two components asking for the same key
-//              share one request.
-// useMutation = changing data (create/update/delete). After a successful change we
-//              "invalidate" the affected keys so any screen showing them refetches.
-// ---------------------------------------------------------------------------
 
 export const recipeKeys = {
   all: ['recipes'] as const,
@@ -63,8 +48,7 @@ export function useRecipe(id: number) {
   return useQuery({ queryKey: recipeKeys.detail(id), queryFn: () => recipesApi.get(id) })
 }
 
-// Every way of creating a recipe ends the same way: put the new recipe in the
-// cache (so its page opens instantly) and mark the list as stale.
+// Seed the new recipe's cache entry so its page opens instantly
 function useCreateMutation<TVariables>(mutationFn: (vars: TVariables) => Promise<Recipe>) {
   const queryClient = useQueryClient()
   return useMutation({

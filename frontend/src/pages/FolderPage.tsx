@@ -20,8 +20,7 @@ export default function FolderPage() {
   // Same idea as the home page: the search text lives in the URL (?q=...)
   const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q') ?? ''
-  // The folder->recipes link lives on each recipe (folder_ids), so we just filter the cached list.
-  // Hooks must run before the early returns below, hence useMemo up here.
+  // Before the early returns: hooks can't be called conditionally
   const inFolder = useMemo(
     () => (recipeList ?? []).filter((r) => r.folder_ids.includes(id)),
     [recipeList, id],

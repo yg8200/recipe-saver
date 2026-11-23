@@ -1,8 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { inputClass, primaryButtonClass } from './RecipeForm'
 
-// A small inline form for naming a new folder (replaces the browser's window.prompt popup).
-// Enter saves, Escape or "ביטול" closes it. The caller decides what "save" does.
 export default function NewFolderForm({
   onSubmit,
   onCancel,

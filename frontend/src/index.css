@@ -10,9 +10,9 @@
   --font-display: "Frank Ruhl Libre", Georgia, serif;
 
   /*
-    Orange is the main accent, green the second. The names brand-50..700 are kept from the old theme so
-    components need no changes: 50 = raised surface (hover/tile background), 100 = border, 200 = stronger
-    border, 500/600 = the orange itself, 700 = orange used as TEXT (darker in light mode for contrast).
+    Orange is the main accent, green the second. 50 = raised surface (hover/tile background),
+    100 = border, 200 = stronger border, 500/600 = the orange itself, 700 = orange used as TEXT
+    (darker in light mode for contrast).
   */
   --color-brand-50: #f6e0c4;
   --color-brand-100: #e6cba8;

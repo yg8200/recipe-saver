@@ -204,8 +204,7 @@ def correct_recipe_text(recipe_json: dict) -> dict:
     """
     client = get_openai_client()
     response = client.chat.completions.create(
-        # gpt-4o-mini misses subtle Hebrew typos and misjudges others; gpt-4o is not slower here and the
-        # input is only a few hundred tokens, so the extra cost is a fraction of a cent (see evals/).
+        # gpt-4o over mini: mini missed subtle Hebrew typos in the evals, at the same speed
         model=get_openai_model("OPENAI_CORRECTOR_MODEL", default=DEFAULT_CORRECTOR_MODEL),
         temperature=0.0,
         response_format={"type": "json_object"},

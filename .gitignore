@@ -1,15 +1,11 @@
-# ==========================================
-# Environments & Secrets (CRITICAL)
-# ==========================================
+# Environments & Secrets
 .env
 .env.*
 !.env.example
 *.pem
 *.key
 
-# ==========================================
 # Python Bytecode & Artifacts
-# ==========================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -31,9 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 
-# ==========================================
 # Virtual Environments
-# ==========================================
 .venv/
 venv/
 ENV/
@@ -41,9 +35,7 @@ env/
 env.bak/
 venv.bak/
 
-# ==========================================
 # Testing & Code Quality
-# ==========================================
 .pytest_cache/
 .coverage
 .coverage.*
@@ -56,18 +48,14 @@ coverage.xml
 *.py,cover
 .hypothesis/
 
-# ==========================================
 # Databases & Local Mounts
-# ==========================================
 *.sqlite3
 *.db
 *.sqlite
 # Local Docker volume data if bind-mounted
 pgdata/
 
-# ==========================================
 # Operating System & IDEs
-# ==========================================
 # macOS
 .DS_Store
 .AppleDouble
@@ -87,7 +75,5 @@ backend/uploads/
 
 # Local logs
 *.log
-# ==========================================
 # Local notes for Claude Code (not committed)
-# ==========================================
 CLAUDE.md

@@ -18,8 +18,7 @@ def update_recipe(recipe_id: int):
     if recipe is None:
         return jsonify({"error": f"Recipe with id {recipe_id} not found"}), 404
 
-    # Validate everything first and only then touch the recipe, so a rejected
-    # request never leaves half-applied changes in the session.
+    # Validate everything before changing anything, so a bad request changes nothing
     updates = {}
 
     if "title" in data:

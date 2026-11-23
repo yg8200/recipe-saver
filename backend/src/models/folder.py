@@ -1,9 +1,7 @@
 from datetime import datetime, timezone
 from src.core.database import db
 
-# Link table for the many-to-many relation: one row = "this recipe is in this folder".
-# The composite primary key makes a duplicate link impossible, and ON DELETE CASCADE means the
-# database itself cleans up links when either side is deleted. The recipe is never deleted by a folder.
+# Many-to-many link. CASCADE removes links (never recipes) when either side is deleted
 recipe_folders = db.Table(
     "recipe_folders",
     db.Column("recipe_id", db.Integer, db.ForeignKey("recipes.id", ondelete="CASCADE"), primary_key=True),
