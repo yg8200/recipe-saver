@@ -5,8 +5,7 @@ import type { Folder } from '../api/types'
 import { RECIPE_DRAG_TYPE } from '../utils/dragDrop'
 import FolderIcon from './FolderIcon'
 
-// Two tones, alternating by folder id: orange and green. (Full class names are written out
-// so Tailwind can see them at build time.)
+// Full class names so Tailwind finds them at build time
 const TONES = [
   {
     tile: 'border-[#f3d1b8] bg-[#fdf1e8] hover:border-brand-600 dark:border-[#52301b] dark:bg-[#2a180d]',
@@ -20,8 +19,7 @@ const TONES = [
 
 const tileBase = 'group relative flex flex-col items-center justify-center gap-0.5 overflow-hidden rounded-2xl p-5 text-center transition'
 
-// One folder as a square tile. The whole tile is a link that opens the folder page,
-// and also a drop target: drop a recipe card on it to add that recipe to the folder.
+// Links to the folder and is a drop target for recipe cards
 export default function FolderTile({ folder }: { folder: Folder }) {
   const tone = TONES[folder.id % TONES.length]
   const addRecipe = useToggleRecipeInFolder()

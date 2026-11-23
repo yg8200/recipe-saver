@@ -7,8 +7,7 @@ from src.services.image_store import delete_recipe_image, save_recipe_image, upl
 
 recipe_image_bp = Blueprint("recipe_image", __name__)
 
-# Stored names are random and a changed photo gets a NEW name, so a file never changes
-# under its URL. That makes it safe for browsers to cache for a year.
+# A replaced photo gets a new file name, so a URL's content never changes
 ONE_YEAR = 60 * 60 * 24 * 365
 
 

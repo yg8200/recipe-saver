@@ -20,7 +20,7 @@ def scrape_recipe_page(url: str) -> str:
 def scrape_recipe(url: str) -> ScrapedPage:
     """Fetches the page once and returns both its readable text and its main image URL."""
     try:
-        # Impersonate authentic Chrome TLS & HTTP/2 signatures
+        # Look like Chrome: many recipe sites block non-browser clients
         response = requests.get(
             url,
             impersonate="chrome124",
@@ -40,7 +40,7 @@ def scrape_recipe(url: str) -> ScrapedPage:
     # Look for the image BEFORE the cleanup below: it deletes the <script> tags that hold the JSON-LD
     image_url = find_page_image_url(soup, str(getattr(response, "url", "") or url))
 
-    # Strip script, style, navigation, ads, and structural elements
+    # Less noise and fewer tokens for the AI
     for tag in soup(
         ["script", "style", "nav", "header", "footer", "aside", "form", "svg"]
     ):

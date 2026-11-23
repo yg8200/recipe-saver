@@ -3,7 +3,6 @@ import { useRecipes } from '../api/recipes'
 import ThemeToggle from './ThemeToggle'
 
 // The frame shared by every page: header + the current page's content.
-// <Outlet /> is where React Router renders the page that matches the URL.
 export default function Layout() {
   const { data: recipes } = useRecipes() // same cached request the home page uses
   return (
@@ -23,7 +22,6 @@ export default function Layout() {
           </Link>
 
           <nav className="flex items-center gap-2 whitespace-nowrap text-sm font-semibold sm:gap-3">
-            {/* NavLink knows whether it matches the current URL, so we can highlight it */}
             <NavLink
               to="/"
               end

@@ -1,5 +1,4 @@
-// A simple outline folder. Drawn with currentColor so the parent picks the color
-// and it follows light/dark mode (an emoji looks different on every device).
+// currentColor so it follows the theme
 export default function FolderIcon({ className = '' }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">

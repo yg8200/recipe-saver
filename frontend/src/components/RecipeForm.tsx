@@ -1,8 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import type { Recipe, RecipeInput } from '../api/types'
 
-// The form keeps everything as strings (that's what <input> and <textarea> give us)
-// and only converts to the API shape (arrays, numbers) on submit.
+// Fields stay strings while editing; converted to the API shape on submit
 interface FormValues {
   title: string
   ingredients: string
@@ -26,8 +25,7 @@ function toFormValues(recipe?: Recipe): FormValues {
 const toLines = (text: string) => text.split('\n').map((line) => line.trim()).filter(Boolean)
 const toNumber = (text: string) => (text.trim() === '' ? null : Number(text))
 
-// Same rules the backend enforces. Checking here too gives instant feedback without a round trip;
-// the backend check still matters because anyone can call the API directly.
+// Same rules as the backend, for instant feedback
 function validate(values: FormValues): string | null {
   if (!values.title.trim()) return 'נא לתת למתכון שם.'
   if (toLines(values.ingredients).length === 0) return 'נא להוסיף לפחות מצרך אחד.'
@@ -52,13 +50,12 @@ export default function RecipeForm({ initialRecipe, submitLabel, isSubmitting, s
   const [values, setValues] = useState(() => toFormValues(initialRecipe))
   const [validationError, setValidationError] = useState<string | null>(null)
 
-  // A handler factory: update('title') returns the onChange function for the title field.
-  // "...prev" copies the other fields, so only the one being typed in changes.
+  // update('title') returns the onChange handler for the title field
   const update = (field: keyof FormValues) => (e: { target: { value: string } }) =>
     setValues((prev) => ({ ...prev, [field]: e.target.value }))
 
   function handleSubmit(e: FormEvent) {
-    e.preventDefault() // stop the browser's default full-page form submission
+    e.preventDefault()
     const error = validate(values)
     setValidationError(error)
     if (error) return

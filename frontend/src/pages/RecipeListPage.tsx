@@ -8,11 +8,9 @@ import { EmptyState, ErrorMessage, Spinner } from '../components/StatusViews'
 export default function RecipeListPage() {
   const { data: recipes, isPending, error, refetch } = useRecipes()
 
-  // The search text lives in the URL (?q=...) rather than in useState,
-  // so a search survives a page refresh and can be shared as a link.
+  // Search lives in the URL so it survives a refresh
   const [searchParams, setSearchParams] = useSearchParams()
   const query = searchParams.get('q') ?? ''
-  // useMemo: only re-filter when the recipes or the query change, not on every render
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!recipes || !q) return recipes ?? []
@@ -27,7 +25,6 @@ export default function RecipeListPage() {
   return (
     <div className="space-y-9">
       <section className="relative overflow-hidden rounded-3xl border border-amber-200/15 bg-gradient-to-l from-[#d4621c] via-[#c25416] to-hero-to p-6 text-white shadow-xl shadow-black/20 sm:p-8">
-        {/* Decorative circles, purely visual */}
         <span aria-hidden className="pointer-events-none absolute -start-10 -bottom-16 size-64 rounded-full bg-white/[0.07]" />
         <span aria-hidden className="pointer-events-none absolute start-36 -top-20 size-44 rounded-full bg-amber-300/[0.06]" />
         <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">

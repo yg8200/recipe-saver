@@ -5,7 +5,6 @@ BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__
 
 
 class Config:
-    """Base configuration with default settings."""
     TESTING = False
     DEBUG = False
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
@@ -21,20 +20,17 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    """Configuration for local development."""
     DEBUG = True
 
 
 class TestingConfig(Config):
-    """Configuration for automated test runs."""
     TESTING = True
     DEBUG = True
-    # In-memory SQLite for fast, isolated tests without requiring a running PostgreSQL instance
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 
 
 class ProductionConfig(Config):
-    """Configuration for production deployments."""
+    # No dev fallback in production
     SECRET_KEY = os.getenv("SECRET_KEY")
 
 

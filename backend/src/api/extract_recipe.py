@@ -3,8 +3,6 @@ from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 from src.core.database import db
 from src.models.recipe import Recipe
-
-# Ensure these imports match your actual file names
 from src.services.scraper import scrape_recipe
 from src.services.image_store import delete_recipe_image
 from src.services.recipe_image import fetch_and_store_image, youtube_thumbnail_urls
@@ -84,29 +82,24 @@ def extract_recipe():
                 "existing_recipe_id": existing.id,
             }), 409
 
-        # Route to the correct extraction service
         if is_youtube_url(url):
-            # The YouTube extractor now handles description vs transcript logic internally
             raw_extracted = extract_recipe_from_youtube(url)
             image_candidates = youtube_thumbnail_urls(get_youtube_video_id(url))
         elif is_facebook_url(url):
-            # Facebook: the recipe must be in the caption; the video thumbnail becomes the dish photo
             post = get_facebook_post(url)
             raw_extracted = extract_recipe_from_facebook_caption(post.caption)
             image_candidates = [post.thumbnail_url]
         else:
-            # Standard webpage scraping: one fetch gives both the text and the page's main image
             page = scrape_recipe(url)
             raw_extracted = extract_recipe_from_text(page.text)
             image_candidates = [page.image_url]
 
-        # Apply the guardrail to ensure the AI actually found valid lists
+        # Before the photo download, so a rejected recipe costs no download
         validated_data = validate_extracted_recipe(raw_extracted)
 
         # Best effort: a missing or broken photo never stops the recipe from being saved.
         image_filename = fetch_and_store_image(image_candidates)
 
-        # Save to database
         new_recipe = Recipe(**validated_data, source_url=url, image_filename=image_filename)
 
         db.session.add(new_recipe)
@@ -122,7 +115,6 @@ def extract_recipe():
     except ValueError as ve:
         db.session.rollback()
         delete_recipe_image(image_filename)
-        # Gracefully catches our "has_recipe is false" errors and missing transcripts
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         db.session.rollback()

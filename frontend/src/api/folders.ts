@@ -27,8 +27,7 @@ export function useFolders() {
   return useQuery({ queryKey: folderKeys.all, queryFn: foldersApi.list })
 }
 
-// A folder change affects two caches: the folder list (names, recipe counts) and the recipes
-// (each recipe carries its folder_ids). Invalidating both keeps every screen consistent.
+// Recipes carry folder_ids, so a folder change invalidates both caches
 function useFolderMutation<TVariables, TResult>(mutationFn: (vars: TVariables) => Promise<TResult>) {
   const queryClient = useQueryClient()
   return useMutation({

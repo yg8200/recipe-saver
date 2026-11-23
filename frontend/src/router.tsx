@@ -7,8 +7,6 @@ import NotFoundPage from './pages/NotFoundPage'
 import RecipeDetailPage from './pages/RecipeDetailPage'
 import RecipeListPage from './pages/RecipeListPage'
 
-// URL -> page. Every route is a child of Layout, so they all share the header;
-// the matching child renders where Layout puts <Outlet />.
 export const router = createBrowserRouter([
   {
     element: <Layout />,

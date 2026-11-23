@@ -21,8 +21,7 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
   return (
     <Link
       to={`/recipes/${recipe.id}`}
-      // Drag the card onto a folder tile to add the recipe to that folder. "copy" because the
-      // recipe stays where it is (it can be in several folders).
+      // "copy": the recipe can be in several folders
       draggable
       onDragStart={(e) => {
         e.dataTransfer.setData(RECIPE_DRAG_TYPE, String(recipe.id))

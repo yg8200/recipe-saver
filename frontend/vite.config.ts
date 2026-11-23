@@ -7,10 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
-    // Dev proxy: the browser only ever talks to Vite (localhost:5173).
-    // Any request starting with /api is forwarded to Flask, with the /api prefix removed:
-    //   GET /api/recipes/5  ->  GET http://127.0.0.1:5001/recipes/5
-    // Because the browser sees a single origin, Flask doesn't need CORS headers.
+    // /api/recipes/5 -> Flask /recipes/5. Same origin, so no CORS needed
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:5001',

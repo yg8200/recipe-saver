@@ -92,8 +92,7 @@ def youtube_thumbnail_urls(video_id: str) -> list[str]:
 def download_image(url: str) -> bytes | None:
     """Downloads an image, or returns None. Never raises: a missing photo must not break a save."""
     try:
-        # Redirects are followed by hand so every hop can be checked (a public URL may redirect
-        # to an internal address).
+        # Follow redirects by hand so every hop gets the SSRF check
         for _ in range(MAX_REDIRECTS + 1):
             if not is_public_http_url(url):
                 return None

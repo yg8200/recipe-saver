@@ -15,8 +15,7 @@ function readStored(): Theme | null {
 
 const systemPrefersDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches
 
-// The theme is just a class on <html>. index.html applies it before React loads (no white flash),
-// so here we read what is already set instead of deciding again.
+// index.html already set the class before React loaded; read it back
 const currentTheme = (): Theme => (document.documentElement.classList.contains('dark') ? 'dark' : 'light')
 
 function apply(theme: Theme) {

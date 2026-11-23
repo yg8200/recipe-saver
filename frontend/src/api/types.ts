@@ -1,5 +1,4 @@
-// TypeScript mirror of the backend's Recipe.to_dict() (backend/src/models/recipe.py).
-// If the backend shape changes, update it here and TypeScript will point to every place that breaks.
+// Mirrors the backend's Recipe.to_dict() (backend/src/models/recipe.py): keep the two in sync.
 export interface Recipe {
   id: number
   title: string

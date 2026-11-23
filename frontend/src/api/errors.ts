@@ -1,6 +1,4 @@
-// The backend answers in English ({"error": "..."}). The whole UI is Hebrew, so we translate the
-// messages it can produce here, in one place, instead of scattering Hebrew through the API layer.
-// Patterns are checked in order; the first match wins.
+// Backend errors are English; translate them to Hebrew here. First matching pattern wins.
 const TRANSLATIONS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/A recipe with the title '(.+)' already exists/, (m) => `כבר יש מתכון בשם “${m[1]}”.`],
   [/A recipe with this title already exists/, () => 'כבר יש מתכון עם השם הזה.'],
@@ -37,8 +35,7 @@ export function translateError(status: number, message: string): string {
     const match = message.match(pattern)
     if (match) return toHebrew(match)
   }
-  // Unknown message (for example an unexpected server error): keep the original for developers
-  // in the console and show a friendly Hebrew sentence to the user.
+  // Unknown message: log the original, show a generic Hebrew one
   console.error(`API error ${status}: ${message}`)
   if (status === 404) return 'לא נמצא.'
   if (status >= 500) return 'משהו השתבש בשרת. נסו שוב בעוד רגע.'

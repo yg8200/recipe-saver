@@ -7,8 +7,7 @@ app = create_app()
 
 if __name__ == "__main__":
     with app.app_context():
-        # Bring the database schema up to date. Unlike db.create_all() this also ADDS new columns
-        # to tables that already exist (see backend/migrations/).
+        # Migrations, not create_all(): create_all() never adds columns to existing tables
         upgrade()
 
     app.run(host="0.0.0.0", port=5001, debug=True)

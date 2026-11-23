@@ -10,8 +10,7 @@ get_recipe_bp = Blueprint("get_recipe", __name__)
 
 @get_recipe_bp.route("/recipes", methods=["GET"])
 def get_all_recipes():
-    # Oldest first (by id), so the list reads in the order recipes were saved.
-    # selectinload fetches every recipe's folders in ONE extra query (avoids the N+1 problem).
+    # selectinload: one extra query for all folders instead of one per recipe (N+1)
     query = Recipe.query.options(selectinload(Recipe.folders))
 
     # Query-string values are always text (or None when the parameter is missing)

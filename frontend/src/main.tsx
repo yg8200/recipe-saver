@@ -18,8 +18,6 @@ const queryClient = new QueryClient({
   },
 })
 
-// Entry point: find <div id="root"> in index.html and render the app into it.
-// The providers make the query cache and the router available to every component below them.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
